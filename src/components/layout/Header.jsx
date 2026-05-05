@@ -20,13 +20,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-4 px-4 md:px-6">
-        <SidebarTrigger aria-label="Toggle sidebar" />
-
+          <SidebarTrigger className="block md:hidden" />
         <h1 className="text-center text-lg font-semibold tracking-normal text-foreground md:text-left">
           {getTitle(pathname)}
         </h1>
-
-        <Button asChild aria-label="Open settings" size="icon" variant="ghost">
+        <Button asChild aria-label="Open settings" size="icon" variant="ghost" className="ml-auto">
           <Link to="/settings">
             <Settings aria-hidden="true" />
           </Link>

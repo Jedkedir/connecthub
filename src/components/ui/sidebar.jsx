@@ -229,7 +229,8 @@ function Sidebar({
 }
 
 function SidebarTrigger({ className, onClick, ...props }) {
-  const { toggleSidebar } = useSidebar()
+  const { open, openMobile, isMobile, toggleSidebar } = useSidebar()
+  const showLabel = isMobile ? openMobile : open
 
   return (
     <Button
@@ -237,14 +238,17 @@ function SidebarTrigger({ className, onClick, ...props }) {
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon-sm"
-      className={cn(className)}
+      className={cn("justify-start gap-2 px-2", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
       {...props}
     >
-      <RiSideBarLine />
+      <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+        <RiSideBarLine />
+      </span>
+      {showLabel && <span className="truncate font-medium">ConnectHub</span>}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

@@ -16,6 +16,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import SidebarItem from "@/components/layout/SidebarItem"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
@@ -35,21 +36,16 @@ function isRouteActive(pathname, to) {
 export default function Sidebar() {
   const { pathname } = useLocation()
   const { setOpenMobile } = useSidebar()
-
+ 
   return (
     <ShadcnSidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
-              <Link to="/">
-                <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                  C
-                </span>
-                <span className="text-sm font-semibold tracking-normal">
-                  ConnectHub
-                </span>
-              </Link>
+              <SidebarTrigger aria-label="Toggle sidebar" >
+                
+              </SidebarTrigger>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
