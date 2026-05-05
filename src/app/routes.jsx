@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom"
 
 import AuthLayout from "@/layouts/AuthLayout"
 import MainLayout from "@/layouts/MainLayout"
+import Bookmarks from "@/pages/Bookmarks"
 import Explore from "@/pages/Explore"
 import Home from "@/pages/Home"
 import Login from "@/pages/Login"
@@ -15,8 +16,10 @@ export default function AppRoutes() {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
         <Route path="/search" element={<Explore />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Setting />} />
