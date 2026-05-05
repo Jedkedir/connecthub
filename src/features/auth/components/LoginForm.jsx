@@ -23,11 +23,7 @@ export default function LoginForm() {
         <Label htmlFor="login-password" className="text-muted-foreground">
           Password
         </Label>
-        <Input
-          id="login-password"
-          placeholder="••••••••••"
-          type="password"
-        />
+        <Input id="login-password" placeholder="••••••••••" type="password" />
       </div>
 
       <div className="flex flex-row items-center justify-between gap-6">
@@ -60,7 +56,10 @@ export default function LoginForm() {
           />
         </Button>
         <Button className="flex-1" size="lg" type="button" variant="outline">
-          <FaApple aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
+          <FaApple
+            aria-hidden="true"
+            className="h-5 w-5 text-muted-foreground"
+          />
         </Button>
         <Button className="flex-1" size="lg" type="button" variant="outline">
           <FaMicrosoft

@@ -29,11 +29,7 @@ export default function SignupForm() {
         <Label htmlFor="signup-password" className="text-muted-foreground">
           Password
         </Label>
-        <Input
-          id="signup-password"
-          placeholder="•••••••••••"
-          type="password"
-        />
+        <Input id="signup-password" placeholder="•••••••••••" type="password" />
       </div>
 
       <Button className="w-full" size="lg">
@@ -54,7 +50,10 @@ export default function SignupForm() {
           />
         </Button>
         <Button className="flex-1" size="lg" type="button" variant="outline">
-          <FaApple aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
+          <FaApple
+            aria-hidden="true"
+            className="h-5 w-5 text-muted-foreground"
+          />
         </Button>
         <Button className="flex-1" size="lg" type="button" variant="outline">
           <FaMicrosoft

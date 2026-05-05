@@ -1,3 +1,11 @@
+import { Card, CardContent } from "@/components/ui/card"
+
 export default function Feed() {
-  return <p className="mr-10">Home View</p>
+  return (
+    <Card>
+      <CardContent className="p-6 text-sm text-muted-foreground">
+        Home View
+      </CardContent>
+    </Card>
+  )
 }

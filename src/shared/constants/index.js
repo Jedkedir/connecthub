@@ -1,1 +1,1 @@
-export {}
+export { spacing, typography } from "./designTokens"

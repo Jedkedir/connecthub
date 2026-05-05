@@ -5,7 +5,10 @@ import { cn } from "@/shared/utils"
 function Avatar({ className, ...props }) {
   return (
     <div
-      className={cn("relative flex size-10 shrink-0 overflow-hidden rounded-full", className)}
+      className={cn(
+        "relative flex size-10 shrink-0 overflow-hidden rounded-full",
+        className
+      )}
       data-slot="avatar"
       {...props}
     />

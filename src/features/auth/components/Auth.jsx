@@ -13,7 +13,7 @@ export default function Auth() {
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-2">
       <section className="hidden flex-col justify-center gap-8 p-16 lg:flex">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <h1 className="text-5xl font-bold tracking-normal">ConnectHub</h1>
           <p className="max-w-xl text-lg text-muted-foreground">
             The Digital Atelier. A curated space for visionaries to connect,
@@ -58,7 +58,7 @@ export default function Auth() {
       </section>
 
       <section className="flex items-center justify-center p-6">
-        <div className="w-full max-w-md space-y-8">
+        <div className="flex w-full max-w-md flex-col gap-8">
           <Card>
             <CardContent className="flex flex-col gap-6 p-8">
               <div className="relative grid grid-cols-2 rounded-md bg-muted p-1">

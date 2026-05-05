@@ -1,10 +1,11 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import { cva } from "class-variance-authority"
 
-import { cn } from "@/shared/utils"
+import { cn } from "@/shared/utils/index"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -32,9 +33,16 @@ const buttonVariants = cva(
   }
 )
 
-function Button({ asChild = false, className, variant, size, ...props }) {
+function Button({
+  asChild = false,
+  children,
+  className,
+  variant,
+  size,
+  ...props
+}) {
   if (asChild) {
-    const child = React.Children.only(props.children)
+    const child = React.Children.only(children)
 
     return React.cloneElement(child, {
       ...props,
@@ -51,7 +59,9 @@ function Button({ asChild = false, className, variant, size, ...props }) {
       className={cn(buttonVariants({ variant, size, className }))}
       data-slot="button"
       {...props}
-    />
+    >
+      {children}
+    </button>
   )
 }
 
