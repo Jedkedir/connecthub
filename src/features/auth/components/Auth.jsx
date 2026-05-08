@@ -1,14 +1,39 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 import LoginForm from "./LoginForm"
 import SignupForm from "./SignUpForm"
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "../hooks/useAuth"
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState("login")
+  const [notice, setNotice] = useState("")
+  const navigate = useNavigate()
+  const { login, loginState, register, registerState } = useAuth()
+
+  const loginError =
+    loginState.error?.response?.data?.message ?? loginState.error?.message ?? ""
+  const registerError =
+    registerState.error?.response?.data?.message ?? registerState.error?.message ?? ""
+
+  const handleLogin = async (payload) => {
+    setNotice("")
+    await login(payload)
+    navigate("/")
+  }
+
+  const handleRegister = async (payload) => {
+    setNotice("")
+    await register(payload)
+    setActiveTab("login")
+    setNotice("Account created. Sign in with your new credentials.")
+  }
+
+  const isLoading = loginState.isLoading || registerState.isLoading
 
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-2">
@@ -61,6 +86,12 @@ export default function Auth() {
         <div className="flex w-full max-w-md flex-col gap-8">
           <Card>
             <CardContent className="flex flex-col gap-6 p-8">
+              {notice ? (
+                <div className="rounded-md border border-border/70 bg-muted px-4 py-3 text-sm text-muted-foreground">
+                  {notice}
+                </div>
+              ) : null}
+
               <div className="relative grid grid-cols-2 rounded-md bg-muted p-1">
                 <motion.div
                   layoutId="auth-tab-pill"
@@ -88,7 +119,19 @@ export default function Auth() {
               </div>
 
               <div className="min-h-120">
-                {activeTab === "login" ? <LoginForm /> : <SignupForm />}
+                {activeTab === "login" ? (
+                  <LoginForm
+                    error={loginError}
+                    isLoading={isLoading}
+                    onSubmit={handleLogin}
+                  />
+                ) : (
+                  <SignupForm
+                    error={registerError}
+                    isLoading={isLoading}
+                    onSubmit={handleRegister}
+                  />
+                )}
               </div>
             </CardContent>
           </Card>

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
 
 import { Button } from "@/components/ui/button"
@@ -5,23 +6,57 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 
-export default function SignupForm() {
+export default function SignupForm({ error, isLoading, onSubmit }) {
+  const [fullName, setFullName] = useState("")
+  const [identifier, setIdentifier] = useState("")
+  const [password, setPassword] = useState("")
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    try {
+      await onSubmit({
+        username:fullName,
+        email:identifier,
+        password,
+      })
+
+      setFullName("")
+      setIdentifier("")
+      setPassword("")
+    } catch {
+      // The parent hook already exposes the error state.
+    }
+  }
+
   return (
-    <div className="mt-4 flex flex-col gap-6">
+    <form className="mt-4 flex flex-col gap-6" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
         <Label htmlFor="signup-name" className="text-muted-foreground">
-          Fullname
+          Full name
         </Label>
-        <Input id="signup-name" placeholder="John Doe" type="text" />
+        <Input
+          autoComplete="name"
+          id="signup-name"
+          onChange={(event) => setFullName(event.target.value)}
+          placeholder="John Doe"
+          required
+          type="text"
+          value={fullName}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="signup-identifier" className="text-muted-foreground">
           Email or Username
         </Label>
         <Input
+          autoComplete="email"
           id="signup-identifier"
-          placeholder="@name@atelier.com"
+          onChange={(event) => setIdentifier(event.target.value)}
+          placeholder="name@atelier.com"
+          required
           type="text"
+          value={identifier}
         />
       </div>
 
@@ -29,11 +64,25 @@ export default function SignupForm() {
         <Label htmlFor="signup-password" className="text-muted-foreground">
           Password
         </Label>
-        <Input id="signup-password" placeholder="•••••••••••" type="password" />
+        <Input
+          autoComplete="new-password"
+          id="signup-password"
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="•••••••••••"
+          required
+          type="password"
+          value={password}
+        />
       </div>
 
-      <Button className="w-full" size="lg">
-        Register
+      {error ? (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <Button className="w-full" size="lg" type="submit" disabled={isLoading}>
+        {isLoading ? "Creating Account..." : "Register"}
       </Button>
 
       <div className="flex items-center gap-4">
@@ -62,6 +111,6 @@ export default function SignupForm() {
           />
         </Button>
       </div>
-    </div>
+    </form>
   )
 }

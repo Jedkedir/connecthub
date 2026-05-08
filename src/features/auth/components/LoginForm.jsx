@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
 
 import { Button } from "@/components/ui/button"
@@ -6,29 +7,65 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 
-export default function LoginForm() {
+export default function LoginForm({ error, isLoading, onSubmit }) {
+  const [identifier, setIdentifier] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(true)
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    try {
+      await onSubmit({
+        email:identifier,
+        password,
+        rememberMe,
+      })
+
+      setPassword("")
+    } catch {
+      // The parent hook already exposes the error state.
+    }
+  }
+
   return (
-    <div className="mt-4 flex flex-col gap-6">
+    <form className="mt-4 flex flex-col gap-6" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
         <Label htmlFor="login-identifier" className="text-muted-foreground">
           Email or Username
         </Label>
         <Input
+          autoComplete="username"
           id="login-identifier"
+          onChange={(event) => setIdentifier(event.target.value)}
           placeholder="name@atelier.com"
+          required
           type="text"
+          value={identifier}
         />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="login-password" className="text-muted-foreground">
           Password
         </Label>
-        <Input id="login-password" placeholder="••••••••••" type="password" />
+        <Input
+          autoComplete="current-password"
+          id="login-password"
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="••••••••••"
+          required
+          type="password"
+          value={password}
+        />
       </div>
 
       <div className="flex flex-row items-center justify-between gap-6">
         <div className="flex flex-row items-center gap-2">
-          <Checkbox id="remember" />
+          <Checkbox
+            checked={rememberMe}
+            id="remember"
+            onChange={(event) => setRememberMe(event.target.checked)}
+          />
           <Label htmlFor="remember" className="text-muted-foreground">
             Remember me
           </Label>
@@ -38,8 +75,14 @@ export default function LoginForm() {
         </Button>
       </div>
 
-      <Button className="w-full" size="lg">
-        Sign In
+      {error ? (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <Button className="w-full" size="lg" type="submit" disabled={isLoading}>
+        {isLoading ? "Signing In..." : "Sign In"}
       </Button>
 
       <div className="flex items-center gap-4">
@@ -68,6 +111,6 @@ export default function LoginForm() {
           />
         </Button>
       </div>
-    </div>
+    </form>
   )
 }
