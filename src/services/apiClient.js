@@ -1,7 +1,10 @@
 import axios from "axios"
 
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? "http://localhost:5000"
+const API_BASE_PATH = import.meta.env.VITE_API_BASE_PATH ?? "/api/v1"
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: `${API_ORIGIN}${API_BASE_PATH}`,
 })
 
 api.interceptors.request.use((config) => {
@@ -14,3 +17,4 @@ api.interceptors.request.use((config) => {
 })
 
 export default api
+export { API_BASE_PATH, API_ORIGIN }
