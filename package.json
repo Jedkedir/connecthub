@@ -15,6 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.4.2",
+    "@dicebear/converter": "^9.4.2",
+    "@dicebear/core": "^9.4.2",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@remixicon/react": "^4.9.0",
     "@tailwindcss/vite": "^4.2.1",

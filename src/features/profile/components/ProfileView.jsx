@@ -11,7 +11,7 @@ import Posts from "@/features/posts/components/Posts"
 import Saved from "@/features/posts/components/Saved"
 import { useProfileTabs } from "@/features/profile/hooks/useProfileTabs"
 
-import {useAuthStore} from "@/features/auth"
+import { useAuthStore } from "@/features/auth"
 //import { useProfileStore } from "@/features/profile"
 import { cn } from "@/shared/utils"
 
@@ -29,7 +29,6 @@ export default function ProfileView() {
   const user = useAuthStore((state) => state.user)
   //const userPosts = useProfileStore((state) => state.userPosts)
 
-
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Card className="overflow-hidden">
@@ -42,8 +41,8 @@ export default function ProfileView() {
           <div className="flex flex-row items-center justify-between p-6">
             <Avatar className="-mt-20 size-24 rounded-xl border-4 border-background md:size-40">
               <AvatarImage
-                src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww"
-                alt="Profile"
+                src={user?.profilePic ?? ""}
+                alt={user?.username ?? "User"}
               />
             </Avatar>
             <div className="flex flex-row gap-2">
@@ -66,7 +65,8 @@ export default function ProfileView() {
           <p className="text-sm text-muted-foreground">@{user?.email ?? ""}</p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-          {user?.bio ?? "Tech enthusiast, digital artist, and coffee lover. Sharing my journey through code and creativity."}
+          {user?.bio ??
+            "Tech enthusiast, digital artist, and coffee lover. Sharing my journey through code and creativity."}
         </p>
         <div className="flex flex-row items-center gap-8">
           {[

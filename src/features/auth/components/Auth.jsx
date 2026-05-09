@@ -18,7 +18,9 @@ export default function Auth() {
   const loginError =
     loginState.error?.response?.data?.message ?? loginState.error?.message ?? ""
   const registerError =
-    registerState.error?.response?.data?.message ?? registerState.error?.message ?? ""
+    registerState.error?.response?.data?.message ??
+    registerState.error?.message ??
+    ""
 
   const handleLogin = async (payload) => {
     setNotice("")

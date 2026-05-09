@@ -97,12 +97,19 @@ export default function Sidebar() {
                 <Avatar className="size-8">
                   <AvatarImage
                     alt={user?.username ?? "User"}
-                    src={user?.avatarUrl ?? "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww"}
+                    src={
+                      user?.profilePic ??
+                      "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww"
+                    }
                   />
-                  <AvatarFallback>{user?.username?.charAt(0)?.toUpperCase() ?? "U"}</AvatarFallback>
+                  <AvatarFallback>
+                    {user?.username?.charAt(0)?.toUpperCase() ?? "U"}
+                  </AvatarFallback>
                 </Avatar>
                 <span className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user?.username ?? "User Name"}</span>
+                  <span className="truncate font-medium">
+                    {user?.username ?? "User Name"}
+                  </span>
                   <span className="truncate text-xs text-muted-foreground">
                     @{user?.email ?? ""}
                   </span>

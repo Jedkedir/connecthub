@@ -17,5 +17,5 @@ export const profileService = {
     return api
       .get(endpoints.posts.byUser(userId), { params })
       .then((response) => response.data)
-  }
+  },
 }

@@ -17,7 +17,7 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
 
     try {
       await onSubmit({
-        email:identifier,
+        email: identifier,
         password,
         rememberMe,
       })

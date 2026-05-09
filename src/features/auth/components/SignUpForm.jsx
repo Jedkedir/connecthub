@@ -16,8 +16,8 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
 
     try {
       await onSubmit({
-        username:fullName,
-        email:identifier,
+        username: fullName,
+        email: identifier,
         password,
       })
 
