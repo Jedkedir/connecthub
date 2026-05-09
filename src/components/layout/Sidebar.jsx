@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar"
 import SidebarItem from "@/components/layout/SidebarItem"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-
+import { useAuthStore } from "../../features/auth"
 const navItems = [
   { icon: Home, label: "Home", to: "/" },
   { icon: Compass, label: "Explore", to: "/explore" },
@@ -36,6 +36,7 @@ function isRouteActive(pathname, to) {
 export default function Sidebar() {
   const { pathname } = useLocation()
   const { setOpenMobile } = useSidebar()
+  const user = useAuthStore((state) => state.user)
 
   return (
     <ShadcnSidebar collapsible="icon">
@@ -95,15 +96,15 @@ export default function Sidebar() {
               <Link onClick={() => setOpenMobile(false)} to="/profile">
                 <Avatar className="size-8">
                   <AvatarImage
-                    alt="Elena Vance"
-                    src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww"
+                    alt={user?.username ?? "User"}
+                    src={user?.avatarUrl ?? "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww"}
                   />
-                  <AvatarFallback>EV</AvatarFallback>
+                  <AvatarFallback>{user?.username?.charAt(0)?.toUpperCase() ?? "U"}</AvatarFallback>
                 </Avatar>
                 <span className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Elena Vance</span>
+                  <span className="truncate font-medium">{user?.username ?? "User Name"}</span>
                   <span className="truncate text-xs text-muted-foreground">
-                    @elana_vance
+                    @{user?.email ?? ""}
                   </span>
                 </span>
               </Link>

@@ -13,4 +13,9 @@ export const profileService = {
       .put(endpoints.users.update, payload)
       .then((response) => response.data)
   },
+  getUserPosts(userId, params) {
+    return api
+      .get(endpoints.posts.byUser(userId), { params })
+      .then((response) => response.data)
+  }
 }

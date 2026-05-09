@@ -1,19 +1,21 @@
 import api from "@/services/apiClient"
 import { endpoints } from "@/services/endpoints"
+import { useAuthStore } from "../auth.store"
+
 //TODO: Find a more secure way to store tokens, such as HttpOnly cookies, to mitigate XSS risks. LocalStorage is used here for simplicity and demonstration purposes only.
 function extractAuthData(payload) {
   return payload?.data ?? payload ?? {}
 }
 
 function persistAuthTokens(payload) {
-  const { accessToken, refreshToken } = extractAuthData(payload)
+  const { accessToken, refreshToken, user } = extractAuthData(payload)
 
-  if (accessToken) {
-    localStorage.setItem("accessToken", accessToken)
-  }
-
-  if (refreshToken) {
-    localStorage.setItem("refreshToken", refreshToken)
+  if (accessToken || refreshToken || user) {
+    useAuthStore.getState().login({
+      user: user || null,
+      accessToken: accessToken || null,
+      refreshToken: refreshToken || null,
+    })
   }
 }
 

@@ -10,6 +10,9 @@ import Likes from "@/features/posts/components/Likes"
 import Posts from "@/features/posts/components/Posts"
 import Saved from "@/features/posts/components/Saved"
 import { useProfileTabs } from "@/features/profile/hooks/useProfileTabs"
+
+import {useAuthStore} from "@/features/auth"
+//import { useProfileStore } from "@/features/profile"
 import { cn } from "@/shared/utils"
 
 export default function ProfileView() {
@@ -22,6 +25,10 @@ export default function ProfileView() {
     showPosts,
     showSaved,
   } = useProfileTabs()
+
+  const user = useAuthStore((state) => state.user)
+  //const userPosts = useProfileStore((state) => state.userPosts)
+
 
   return (
     <div className="flex flex-1 flex-col gap-8">
@@ -54,22 +61,18 @@ export default function ProfileView() {
       <section className="flex flex-col items-start gap-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-semibold tracking-normal text-foreground">
-            Elena Vance
+            {user?.username ?? "User Name"}
           </h2>
-          <p className="text-sm text-muted-foreground">@elana_vance</p>
+          <p className="text-sm text-muted-foreground">@{user?.email ?? ""}</p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-          Visual storyteller and digital architect. Crafting immersive
-          experiences at the intersection of light, code, and emotion.
-          Translating abstract ideas into tactile interfaces, where design
-          breathes and systems feel human. Driven by precision, guided by
-          curiosity-building worlds that don&apos;t just function, but resonate.
+          {user?.bio ?? "Tech enthusiast, digital artist, and coffee lover. Sharing my journey through code and creativity."}
         </p>
         <div className="flex flex-row items-center gap-8">
           {[
-            ["12.4K", "Followers"],
-            ["842", "Following"],
-            ["156", "Posts"],
+            [user?.followerCount ?? "0", "Followers"],
+            [user?.followingCount ?? "0", "Following"],
+            [user?.postCount ?? "0", "Posts"],
           ].map(([value, label]) => (
             <div key={label} className="flex flex-col gap-1">
               <p className="text-xl font-semibold">{value}</p>

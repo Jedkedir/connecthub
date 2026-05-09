@@ -7,7 +7,8 @@ export function useProfile() {
   const getCurrentUserAction = useAsyncAction(profileService.getCurrentUser)
   const getUserByIdAction = useAsyncAction(profileService.getUserById)
   const updateProfileAction = useAsyncAction(profileService.updateProfile)
-
+  const getUserPostsAction = useAsyncAction(profileService.getUserPosts)
+  
   return useMemo(
     () => ({
       getCurrentUser: getCurrentUserAction.execute,
@@ -16,7 +17,9 @@ export function useProfile() {
       getUserByIdState: getUserByIdAction,
       updateProfile: updateProfileAction.execute,
       updateProfileState: updateProfileAction,
+      getUserPosts: getUserPostsAction.execute,
+      getUserPostsState: getUserPostsAction,
     }),
-    [getCurrentUserAction, getUserByIdAction, updateProfileAction]
+    [getCurrentUserAction, getUserByIdAction, updateProfileAction, getUserPostsAction]
   )
 }
