@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import {Separator} from "@/components/ui/separator"
 import {
   Heart,
   MessageCircle,
@@ -90,7 +91,7 @@ export default function Post({
           </div>
         </div>
       </CardHeader>
-
+      <Separator/>
       {/* Post Content */}
       <CardContent className="space-y-3" onClick={()=>{handlePostDetail(post.id)}}>
         {post.content && <p className="text-sm">{post.content}</p>}

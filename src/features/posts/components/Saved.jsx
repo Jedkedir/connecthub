@@ -43,7 +43,7 @@ export default function Saved() {
   }
   if (bookmarkedPosts.length > 0) {
     return (
-      <div className="mx-auto flex max-w-4xl flex-col gap-4">
+      <div className="mx-auto flex max-w-4xl flex-col gap-4 w-full">
         {bookmarkedPosts.map((post) => {
           return <Post key={post._id} post={post.postId} />
         })}

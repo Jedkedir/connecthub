@@ -35,7 +35,7 @@ export default function Posts({ user }) {
     return <div className="text-center text-muted-foreground">No posts yet.</div>
   }
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-4">
+    <div className="mx-auto flex max-w-4xl flex-col gap-4 w-full">
       {posts.map((post) => (
         <Post key={post._id} post={post} />
       ))}

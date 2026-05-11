@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import {Separator} from "@/components/ui/separator"
 import {
   Heart,
   MessageCircle,
@@ -257,7 +258,7 @@ const timeAgo = isValid(postDate)
   if (!post) return null
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background rounded-t-full">
       {/* Header with back button */}
       <div className="sticky top-0 z-10 bg-background border-b">
         <div className="container max-w-4xl mx-auto px-4">
@@ -274,7 +275,7 @@ const timeAgo = isValid(postDate)
           </div>
         </div>
       </div>
-
+      
       <div className="container max-w-4xl mx-auto px-4 py-6">
         {/* Post Content */}
         <Card className="border-0 shadow-none">
@@ -302,7 +303,7 @@ const timeAgo = isValid(postDate)
               </DropdownMenuContent>
             </DropdownMenu>
           </CardHeader>
-
+          <Separator/>
           <CardContent className="space-y-3 px-0">
             {post.content && <p className="text-sm">{post.content}</p>}
 
