@@ -111,7 +111,7 @@ export default function Sidebar() {
                     {user?.username ?? "User Name"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    @{user?.email ?? ""}
+                    {user?.email ?? ""}
                   </span>
                 </span>
               </Link>

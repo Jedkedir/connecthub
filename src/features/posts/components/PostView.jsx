@@ -22,6 +22,8 @@ import { useState, useEffect } from "react"
 import { formatDistanceToNow,isValid,parseISO } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { useNavigate } from "react-router-dom"
+import { useAuthStore } from "@/features/auth"
+
 
 function Comment({ comment, onReply, onLikeComment }) {
   const [isLiked, setIsLiked] = useState(false)
@@ -43,13 +45,19 @@ if (comment?.createdAt) {
       setShowReplyInput(false)
     }
   }
+  const currentUserId = useAuthStore((state) => state.user?._id)
+  let avaterSide = "left"
+  if (currentUserId == comment.userId?._id) {
+      avaterSide = "right"
+  }
 
   return (
-    <div className="flex space-x-3">
-      <Avatar className="h-8 w-8">
-        <AvatarImage src={comment.userId?.profilePic || null} />
+    <div className={`flex space-x-3 ${avaterSide === "right" ? "flex-row-reverse" : ""} gap-1 items-center`}>
+      
+      <Avatar className="size-10">
+        <AvatarImage src={comment.userId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
         <AvatarFallback>
-          {comment.userId?.username?.slice(0, 2).toUpperCase() || "U"}
+          {comment.userId?.username?.slice(0, 2).toUpperCase() || "User"}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
@@ -117,7 +125,12 @@ export default function PostView({ postId }) {
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
   const [bookmarksCount, setBookmarksCount] = useState(0)
-
+  const currentUserId = useAuthStore((state) => state.user?._id)
+  let ownPost = false
+  if (currentUserId == post?.authorId?._id) {
+      ownPost = true
+  } 
+  
   const navigate = useNavigate()
   const {
     getPostById,
@@ -149,7 +162,6 @@ export default function PostView({ postId }) {
     if (!id) return
     try {
       const data = await getComments(id)
-      console.log("Fetched comments data:", data.data)
       setComments(data.data || [])
     } catch (err) {
       console.error("Error fetching comments:", err)
@@ -167,7 +179,6 @@ export default function PostView({ postId }) {
     setIsSubmitting(true)
     try {
       const created = await addComment(postId, { content: newComment })
-      console.log("Created comment response:", created)
       // if API returns created comment
       const newCommentObj = created || {
         _id: Date.now().toString(),
@@ -270,7 +281,7 @@ const timeAgo = isValid(postDate)
           <CardHeader className="flex flex-row items-center justify-between space-y-0 px-0">
             <div className="flex items-center space-x-3">
               <Avatar>
-                <AvatarImage src={post.authorId?.profilePic || null} />
+                <AvatarImage src={post.authorId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
                 <AvatarFallback>{getInitials(post.authorId?.username)}</AvatarFallback>
               </Avatar>
               <div>
@@ -286,7 +297,7 @@ const timeAgo = isValid(postDate)
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleDeletePost}>Delete Post</DropdownMenuItem>
+                {ownPost && <DropdownMenuItem onClick={handleDeletePost}>Delete Post</DropdownMenuItem>}
                 <DropdownMenuItem>Report Post</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

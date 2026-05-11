@@ -21,9 +21,10 @@ import { formatDistanceToNow } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 export default function Post({
   post
-}) {
-  const [isLiked, setIsLiked] = useState(false)
-  const [isBookmarked, setIsBookmarked] = useState(false)
+}) 
+{
+  const [isLiked, setIsLiked] = useState(post.isLiked || false)
+  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false)
   const [likesCount, setLikesCount] = useState(post.likesCount)
   const [bookmarksCount, setBookmarksCount] = useState(post.bookmarksCount)
   const { bookmarkPost, likePost, removeBookmark, unlikePost } = usePosts()
@@ -59,7 +60,6 @@ export default function Post({
   }
 
   const getInitials = (username) => {
-    console.log("Generating initials for username:", username)
     return username.slice(0, 2).toUpperCase()
   }
 

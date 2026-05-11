@@ -58,7 +58,6 @@ export default function ProfileView({ userId }) {
 
     fetchProfile()
   }, [userId, authenticatedUserProfile])
-  console.log("PROFILE IN PROFILE VIEW", profile)
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Card className="overflow-hidden">
@@ -71,7 +70,7 @@ export default function ProfileView({ userId }) {
           <div className="flex flex-row items-center justify-between p-6">
             <Avatar className="-mt-20 size-24 rounded-xl border-4 border-background md:size-40">
               <AvatarImage
-                src={profile?.profilePic ?? null}
+                src={profile?.profilePic ?? "https://api.dicebear.com/9.x/adventurer-neutral/svg"}
                 alt={profile?.username ?? "User"}
               />
             </Avatar>
@@ -94,7 +93,7 @@ export default function ProfileView({ userId }) {
           <h2 className="text-2xl font-semibold tracking-normal text-foreground">
             {profile?.username ?? "User Name"}
           </h2>
-          <p className="text-sm text-muted-foreground">@{profile?.email ?? ""}</p>
+          <p className="text-sm text-muted-foreground">{profile?.email ?? ""}</p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
           {profile?.bio ??

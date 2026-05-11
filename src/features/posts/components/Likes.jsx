@@ -11,7 +11,6 @@ export default function Likes() {
       const fetchLikedPosts = async () => {
         try {
           const response = await getLikedPosts()
-          console.log("Fetched liked posts:", response.data)
           setLikedPosts(response.data || [])
         } catch (error) {
           console.error("Error fetching liked posts:", error)
@@ -46,7 +45,6 @@ export default function Likes() {
       return (
         <div className="mx-auto flex max-w-4xl flex-col gap-4">
           {likedPosts.map((post) => {
-            console.log("Post in likedPosts:", post)
             return <Post key={post._id} post={post.postId} />
           })}
         </div>

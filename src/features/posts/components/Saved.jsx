@@ -11,7 +11,6 @@ export default function Saved() {
     const fetchBookmarkedPosts = async () => {
       try {
         const response = await getBookmarkedPosts()
-        console.log("Fetched bookmarked posts:", response.data)
         setBookmarkedPosts(response.data || [])
       } catch (error) {
         console.error("Error fetching bookmarked posts:", error)
@@ -46,7 +45,6 @@ export default function Saved() {
     return (
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
         {bookmarkedPosts.map((post) => {
-          console.log("Post in bookmarkedPosts:", post)
           return <Post key={post._id} post={post.postId} />
         })}
       </div>
