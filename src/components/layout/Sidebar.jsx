@@ -76,7 +76,7 @@ export default function Sidebar() {
                 icon={User}
                 isActive={pathname.startsWith("/profile")}
                 label="Profile"
-                to="/profile"
+                to={`/profile/${user?._id}`}
               />
               <SidebarItem
                 icon={Settings}
@@ -93,7 +93,7 @@ export default function Sidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
-              <Link onClick={() => setOpenMobile(false)} to="/profile">
+              <Link onClick={() => setOpenMobile(false)} to={`/profile/${user?._id}`}>
                 <Avatar className="size-8">
                   <AvatarImage
                     alt={user?.username ?? "User"}

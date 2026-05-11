@@ -16,32 +16,50 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
+import { usePosts } from "../hooks/usePosts"
 export default function Post({
-  post,
-  onLike,
-  onComment,
-  onBookmark,
-  onShare,
-  onReport,
+  post
 }) {
   const [isLiked, setIsLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likesCount, setLikesCount] = useState(post.likesCount)
   const [bookmarksCount, setBookmarksCount] = useState(post.bookmarksCount)
+  const { bookmarkPost, likePost, removeBookmark, unlikePost } = usePosts()
+  const navigate = useNavigate()
+
   const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1))
-    onLike?.(post._id)
+    const next = !isLiked
+    setIsLiked(next)
+    setLikesCount((prev) => (next ? prev + 1 : prev - 1))
+    if (next) {
+      likePost(post._id)
+    } else {
+      unlikePost(post._id)
+    }
   }
 
   const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked)
-    setBookmarksCount((prev) => (isBookmarked ? prev - 1 : prev + 1))
-    onBookmark?.(post._id)
+    const next = !isBookmarked
+    setIsBookmarked(next)
+    setBookmarksCount((prev) => (next ? prev + 1 : prev - 1))
+    if (next) {
+      bookmarkPost(post._id)
+    } else {
+      removeBookmark(post._id)
+    }
+  }
+  const handleShare = () =>{
+    //TODO 
+    console.log("Shared post")
+  }
+  const handlePostDetail = () => {
+    navigate(`/posts/${post._id}`)
   }
 
   const getInitials = (username) => {
+    console.log("Generating initials for username:", username)
     return username.slice(0, 2).toUpperCase()
   }
 
@@ -50,43 +68,31 @@ export default function Post({
   })
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+    <>
+    <Card className="overflow-hidden transition-shadow hover:shadow-lg" >
       {/* Post Header */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center space-x-3">
           <Avatar>
             <AvatarImage
               src={
-                post.authorId.profilePic ||
-                `https://api.dicebear.com/7.x/avataaars/svg?seed=${post.authorId.username}`
+                post?.authorId?.profilePic ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${post?.authorId?.username}`
               }
             />
             <AvatarFallback>
-              {getInitials(post.authorId.username)}
+              {getInitials(post?.authorId?.username || "User")}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm font-semibold">@{post.authorId.username}</p>
+            <p className="text-sm font-semibold">@{post?.authorId?.username}</p>
             <p className="text-xs text-muted-foreground">{timeAgo}</p>
           </div>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onReport?.(post._id)}>
-              Report Post
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </CardHeader>
 
       {/* Post Content */}
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3" onClick={()=>{handlePostDetail(post.id)}}>
         {post.content && <p className="text-sm">{post.content}</p>}
 
         {/* Media Grid */}
@@ -149,7 +155,7 @@ export default function Post({
           variant="ghost"
           size="sm"
           className="flex items-center gap-2"
-          onClick={() => onComment?.(post._id)}
+          onClick={()=>{handlePostDetail(post.id)}}
         >
           <MessageCircle className="h-4 w-4" />
         </Button>
@@ -169,11 +175,12 @@ export default function Post({
           variant="ghost"
           size="sm"
           className="flex items-center gap-2"
-          onClick={() => onShare?.(post._id)}
+          onClick={() => handleShare()}
         >
           <Share2 className="h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>
+    </>
   )
 }

@@ -27,6 +27,11 @@ export const postService = {
       .get(endpoints.posts.bookmarks, { params })
       .then((response) => response.data)
   },
+  getLikedPosts(params) {
+    return api
+      .get(endpoints.posts.liked, { params })
+      .then((response) => response.data)
+  },
   getComments(id, params) {
     return api
       .get(endpoints.posts.comments(id), { params })

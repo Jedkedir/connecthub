@@ -24,6 +24,7 @@ export const endpoints = {
   },
   posts: {
     bookmarks: "/posts/bookmarks/me",
+    liked: "/posts/liked/me",
     byId: (id) => `/posts/${id}`,
     byUser: (userId) => `/posts/user/${userId}`,
     comments: (id) => `/posts/${id}/comments`,

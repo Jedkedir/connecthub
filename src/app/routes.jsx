@@ -9,6 +9,7 @@ import Login from "@/pages/Login"
 import Messages from "@/pages/Messages" // TODO: on later version, this page is not ready yet
 import Notifications from "@/pages/Notifications"
 import Profile from "@/pages/Profile"
+import PostDetail from "@/pages/PostDetail"
 import Setting from "@/pages/Setting"
 
 export default function AppRoutes() {
@@ -21,7 +22,8 @@ export default function AppRoutes() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
         <Route path="/messages" element={<Messages />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/posts/:id" element={<PostDetail />} />
         <Route path="/settings" element={<Setting />} />
       </Route>
       <Route element={<AuthLayout />}>

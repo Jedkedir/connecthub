@@ -1,7 +1,7 @@
+import { useEffect, useState } from "react"
 import { FaHeart, FaShareAlt } from "react-icons/fa"
 import { FaBookmark } from "react-icons/fa6"
 import { PiSquaresFourFill } from "react-icons/pi"
-
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -12,10 +12,11 @@ import Saved from "@/features/posts/components/Saved"
 import { useProfileTabs } from "@/features/profile/hooks/useProfileTabs"
 
 import { useAuthStore } from "@/features/auth"
-//import { useProfileStore } from "@/features/profile"
+import { useProfile } from "../hooks/useProfile"
 import { cn } from "@/shared/utils"
 
-export default function ProfileView() {
+
+export default function ProfileView({ userId }) {
   const {
     displayLikes,
     displayPosts,
@@ -26,9 +27,38 @@ export default function ProfileView() {
     showSaved,
   } = useProfileTabs()
 
-  const user = useAuthStore((state) => state.user)
-  //const userPosts = useProfileStore((state) => state.userPosts)
+  const [profile, setProfile] = useState()
+  const currentUser = useAuthStore((state) => state.user)
 
+  const authenticatedUserProfile =
+    currentUser?._id === userId ||
+    currentUser?.userId === userId ||
+    currentUser?.id === userId
+
+  const { getUserById, getCurrentUser } = useProfile()
+
+  const getProfile = async (id) => {
+    if (!id) return null
+    if (authenticatedUserProfile) {
+      // if current user, prefer currentUser from store
+      return currentUser || (await getCurrentUser())
+    }
+    return await getUserById(id)
+  }
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile(userId)
+        setProfile(data)
+      } catch (err) {
+        console.error("Error fetching profile:", err)
+      }
+    }
+
+    fetchProfile()
+  }, [userId, authenticatedUserProfile])
+  console.log("PROFILE IN PROFILE VIEW", profile)
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Card className="overflow-hidden">
@@ -41,18 +71,20 @@ export default function ProfileView() {
           <div className="flex flex-row items-center justify-between p-6">
             <Avatar className="-mt-20 size-24 rounded-xl border-4 border-background md:size-40">
               <AvatarImage
-                src={user?.profilePic ?? ""}
-                alt={user?.username ?? "User"}
+                src={profile?.profilePic ?? null}
+                alt={profile?.username ?? "User"}
               />
             </Avatar>
-            <div className="flex flex-row gap-2">
-              <Button type="button" variant="outline">
-                Edit Profile
-              </Button>
-              <Button size="icon" type="button" variant="outline">
-                <FaShareAlt />
-              </Button>
-            </div>
+              <div className="flex flex-row gap-2">
+                {authenticatedUserProfile && (
+                  <Button type="button" variant="outline">
+                    Edit Profile
+                  </Button>
+                )}
+                <Button size="icon" type="button" variant="outline">
+                  <FaShareAlt />
+                </Button>
+              </div>
           </div>
         </CardContent>
       </Card>
@@ -60,19 +92,19 @@ export default function ProfileView() {
       <section className="flex flex-col items-start gap-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-semibold tracking-normal text-foreground">
-            {user?.username ?? "User Name"}
+            {profile?.username ?? "User Name"}
           </h2>
-          <p className="text-sm text-muted-foreground">@{user?.email ?? ""}</p>
+          <p className="text-sm text-muted-foreground">@{profile?.email ?? ""}</p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
-          {user?.bio ??
+          {profile?.bio ??
             "Tech enthusiast, digital artist, and coffee lover. Sharing my journey through code and creativity."}
         </p>
         <div className="flex flex-row items-center gap-8">
           {[
-            [user?.followerCount ?? "0", "Followers"],
-            [user?.followingCount ?? "0", "Following"],
-            [user?.postCount ?? "0", "Posts"],
+            [profile?.followerCount ?? "0", "Followers"],
+            [profile?.followingCount ?? "0", "Following"],
+            [profile?.postCount ?? "0", "Posts"],
           ].map(([value, label]) => (
             <div key={label} className="flex flex-col gap-1">
               <p className="text-xl font-semibold">{value}</p>
@@ -114,9 +146,9 @@ export default function ProfileView() {
         </div>
         <Separator />
 
-        {showPosts && <Posts />}
-        {showLikes && <Likes />}
-        {showSaved && <Saved />}
+        {showPosts && <Posts user={profile} />}
+        {authenticatedUserProfile && showLikes && <Likes user={profile} />}
+        {authenticatedUserProfile && showSaved && <Saved user={profile} />}
       </section>
     </div>
   )

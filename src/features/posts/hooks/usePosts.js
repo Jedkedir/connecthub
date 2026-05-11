@@ -10,6 +10,7 @@ export function usePosts() {
   const getBookmarkedPostsAction = useAsyncAction(
     postService.getBookmarkedPosts
   )
+  const getLikedPostsAction = useAsyncAction(postService.getLikedPosts)
   const getCommentsAction = useAsyncAction(postService.getComments)
   const getPostByIdAction = useAsyncAction(postService.getPostById)
   const getUserPostsAction = useAsyncAction(postService.getUserPosts)
@@ -26,7 +27,9 @@ export function usePosts() {
       deletePost: deletePostAction.execute,
       deletePostState: deletePostAction,
       getBookmarkedPosts: getBookmarkedPostsAction.execute,
+      getLikedPosts: getLikedPostsAction.execute,
       getBookmarkedPostsState: getBookmarkedPostsAction,
+      getLikedPostsState: getLikedPostsAction,
       getComments: getCommentsAction.execute,
       getCommentsState: getCommentsAction,
       getPostById: getPostByIdAction.execute,
@@ -45,6 +48,7 @@ export function usePosts() {
       bookmarkPostAction,
       deletePostAction,
       getBookmarkedPostsAction,
+      getLikedPostsAction,
       getCommentsAction,
       getPostByIdAction,
       getUserPostsAction,
