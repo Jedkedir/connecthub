@@ -80,7 +80,7 @@ export default function Auth() {
               />
             </Avatar>
           </div>
-          <p className="text-muted-foreground">Join 12,000+ creators today</p>
+          <p className="text-muted-foreground">More creators today</p>
         </div>
       </section>
 

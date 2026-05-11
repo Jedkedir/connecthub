@@ -1,16 +1,24 @@
 import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
-
+import { EyeOffIcon,EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import {
+  Field,
+  FieldLabel,
+} from "@/components/ui/field"
+import {InputGroup,
+  InputGroupInput,InputGroupButton} from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 
 export default function SignupForm({ error, isLoading, onSubmit }) {
   const [fullName, setFullName] = useState("")
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
+  }
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -31,11 +39,12 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
 
   return (
     <form className="mt-4 flex flex-col gap-6" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-name" className="text-muted-foreground">
+      <Field className="flex flex-col gap-2">
+        <FieldLabel htmlFor="signup-name" className="text-muted-foreground">
           Full name
-        </Label>
-        <Input
+        </FieldLabel>
+        <InputGroup>
+        <InputGroupInput
           autoComplete="name"
           id="signup-name"
           onChange={(event) => setFullName(event.target.value)}
@@ -43,37 +52,44 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
           required
           type="text"
           value={fullName}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-identifier" className="text-muted-foreground">
-          Email or Username
-        </Label>
-        <Input
-          autoComplete="email"
-          id="signup-identifier"
-          onChange={(event) => setIdentifier(event.target.value)}
-          placeholder="name@atelier.com"
-          required
-          type="text"
-          value={identifier}
-        />
-      </div>
+          />
+          </InputGroup>
+      </Field>
+      <Field className="flex flex-col gap-2">
+        <FieldLabel htmlFor="signup-identifier" className="text-muted-foreground">
+          Email address
+        </FieldLabel>
+        <InputGroup>
+          <InputGroupInput
+            autoComplete="email"
+            id="signup-identifier"
+            onChange={(event) => setIdentifier(event.target.value)}
+            placeholder="name@connecthub.com"
+            required
+            type="text"
+            value={identifier}
+          />
+        </InputGroup>
+      </Field>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-password" className="text-muted-foreground">
+      <Field className="flex flex-col gap-2">
+        <FieldLabel htmlFor="signup-password" className="text-muted-foreground">
           Password
-        </Label>
-        <Input
-          autoComplete="new-password"
+        </FieldLabel> 
+        <InputGroup>
+        <InputGroupInput
           id="signup-password"
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="•••••••••••"
           required
-          type="password"
+          type={showPassword ? "text" : "password"}
           value={password}
+          placeholder="Enter password"
         />
-      </div>
+        <InputGroupButton align="inline-end" onClick={togglePasswordVisibility} className="cursor-pointer">
+          {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+        </InputGroupButton>
+      </InputGroup>
+      </Field>
 
       {error ? (
         <p className="text-sm text-destructive" role="alert">

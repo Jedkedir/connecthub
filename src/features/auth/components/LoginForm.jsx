@@ -1,7 +1,14 @@
 import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
-
+import { EyeOffIcon,EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Field,
+  FieldLabel,
+  FieldGroup,
+} from "@/components/ui/field"
+import {InputGroup,
+  InputGroupInput,InputGroupButton} from "@/components/ui/input-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +18,11 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev)
+  }
   const handleSubmit = async (event) => {
     event.preventDefault()
 
@@ -30,34 +41,40 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
 
   return (
     <form className="mt-4 flex flex-col gap-6" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="login-identifier" className="text-muted-foreground">
-          Email or Username
-        </Label>
-        <Input
+      <Field className="flex flex-col gap-2">
+        <FieldLabel htmlFor="login-identifier" className="text-muted-foreground">
+          Email
+        </FieldLabel>
+        <InputGroup>
+        <InputGroupInput
           autoComplete="username"
           id="login-identifier"
           onChange={(event) => setIdentifier(event.target.value)}
-          placeholder="name@atelier.com"
+          placeholder="name@connecthub.com"
           required
           type="text"
           value={identifier}
         />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="login-password" className="text-muted-foreground">
+        </InputGroup>
+      </Field>
+      <Field className="flex flex-col gap-2">
+        <FieldLabel htmlFor="login-password" className="text-muted-foreground">
           Password
-        </Label>
-        <Input
-          autoComplete="current-password"
+        </FieldLabel> 
+        <InputGroup>
+        <InputGroupInput
           id="login-password"
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="••••••••••"
           required
-          type="password"
+          type={showPassword ? "text" : "password"}
           value={password}
+          placeholder="Enter password"
         />
-      </div>
+        <InputGroupButton align="inline-end" onClick={togglePasswordVisibility} className="cursor-pointer">
+          {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+        </InputGroupButton>
+      </InputGroup>
+      </Field>
 
       <div className="flex flex-row items-center justify-between gap-6">
         <div className="flex flex-row items-center gap-2">
@@ -70,9 +87,9 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
             Remember me
           </Label>
         </div>
-        <Button type="button" variant="link" className="h-auto p-0">
+          <Button type="button" variant="link" className="h-auto p-0">
           Forgot Password?
-        </Button>
+          </Button>
       </div>
 
       {error ? (
