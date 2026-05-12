@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { formatDistanceToNow, isValid, parseISO } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { useNavigate } from "react-router-dom"
@@ -43,7 +43,7 @@ function Comment({
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState("")
 
-  let timeAgo = "Just now" // or some default string
+  let timeAgo = "Just now"
 
   if (comment?.createdAt) {
     timeAgo = formatDistanceToNow(parseISO(comment.createdAt), {
@@ -58,15 +58,16 @@ function Comment({
       setShowReplyInput(false)
     }
   }
-  let avaterSide = "left"
-  if (currentUserId == comment.userId?._id) {
-    avaterSide = "right"
+  
+  let avatarSide = "left"
+  if (currentUserId === comment.userId?._id) {
+    avatarSide = "right"
   }
   const isOwnComment = currentUserId === comment.userId?._id
 
   return (
     <div
-      className={`flex space-x-3 ${avaterSide === "right" ? "flex-row-reverse" : ""} items-center gap-1`}
+      className={`flex space-x-3 ${avatarSide === "right" ? "flex-row-reverse" : ""} items-center gap-1`}
     >
       <Link to={`/profile/${comment.userId?._id}`}>
         <Avatar className="size-10">
@@ -223,13 +224,11 @@ export default function PostView({ postId }) {
   const [bookmarksCount, setBookmarksCount] = useState(0)
   const [editingCommentId, setEditingCommentId] = useState(null)
   const [editCommentText, setEditCommentText] = useState("")
+  const [cursor, setCursor] = useState(null)
+  
   const currentUserId = useAuthStore((state) => state.user?._id)
-  let ownPost = false
-  if (currentUserId == post?.authorId?._id) {
-    ownPost = true
-  }
-
   const navigate = useNavigate()
+  
   const {
     getPostById,
     getComments,
@@ -246,9 +245,9 @@ export default function PostView({ postId }) {
     deletePost,
   } = usePosts()
 
-  const fetchPost = async (id) => {
+  // Memoize fetchPost with useCallback
+  const fetchPost = useCallback(async (id) => {
     if (!id) return
-    setIsLoading(true)
     try {
       const { data } = await getPostById(id)
       setPost(data.post)
@@ -257,41 +256,62 @@ export default function PostView({ postId }) {
       setIsBookmarked(data.post.isBookmarked || false)
     } catch (err) {
       console.error("Error fetching post:", err)
-    } finally {
-      setIsLoading(false)
     }
-  }
+  }, [getPostById])
 
-  const fetchComments = async (id) => {
+  // Memoize fetchComments with useCallback
+  const fetchComments = useCallback(async (id, resetCursor = true) => {
     if (!id) return
     try {
-      const { data } = await getComments(id)
-      setComments(data || [])
+      const response = await getComments(id, resetCursor ? null : cursor)
+      const newComments = response.data || []
+      
+      if (resetCursor) {
+        setComments(newComments)
+      } else {
+        setComments(prev => [...prev, ...newComments])
+      }
+      
+      setHasMore(newComments.length > 0)
+      if (newComments.length > 0) {
+        setCursor(newComments[newComments.length - 1]?.createdAt)
+      }
     } catch (err) {
       console.error("Error fetching comments:", err)
     }
-  }
+  }, [getComments, cursor])
+
+  // Initial load effect
   useEffect(() => {
     if (!postId) return
-    fetchPost(postId)
-    fetchComments(postId)
-  }, [postId, isSubmitting])
+    
+    const loadData = async () => {
+      setIsLoading(true)
+      await fetchPost(postId)
+      await fetchComments(postId, true)
+      setIsLoading(false)
+    }
+    
+    loadData()
+  }, [postId, fetchPost, fetchComments])
+
+  // Separate effect for when comments need to refresh after submitting
+  useEffect(() => {
+    if (!postId || !isSubmitting) return
+    
+    const refreshComments = async () => {
+      await fetchComments(postId, true)
+    }
+    
+    refreshComments()
+  }, [isSubmitting, postId, fetchComments])
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return
 
     setIsSubmitting(true)
     try {
-      const created = await addComment(postId, { content: newComment })
-      // if API returns created comment
-      const newCommentObj = created || {
-        _id: Date.now().toString(),
-        userId: { _id: "me", username: "me", profilePic: null },
-        postId,
-        content: newComment,
-        createdAt: new Date().toISOString(),
-      }
-      setComments([newCommentObj, ...comments])
+      await addComment(postId, { content: newComment })
       setNewComment("")
       setPost((p) =>
         p ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
@@ -307,25 +327,9 @@ export default function PostView({ postId }) {
     if (!content.trim()) return
     setIsSubmitting(true)
     try {
-      const created = await addReply(postId, { parentCommentId, content })
-      const newReply = created || {
-        _id: Date.now().toString(),
-        userId: { _id: currentUserId, username: "me", profilePic: null },
-        content,
-        createdAt: new Date().toISOString(),
-        likesCount: 0,
-      }
-      // Update comments with new reply nested under parent
-      setComments(
-        comments.map((c) =>
-          c._id === parentCommentId
-            ? {
-                ...c,
-                replies: [newReply, ...(c.replies || [])],
-              }
-            : c
-        )
-      )
+      await addReply(postId, { parentCommentId, content })
+      // Refresh comments to show the new reply
+      await fetchComments(postId, true)
     } catch (err) {
       console.error("Error adding reply:", err)
     } finally {
@@ -335,41 +339,65 @@ export default function PostView({ postId }) {
 
   const handleLikeComment = async (commentId) => {
     try {
-      const updatedComment = comments.find((c) => c._id === commentId)
-      if (!updatedComment) return
-      const isLiked = updatedComment.isLiked
       // Optimistic update
-      setComments(
-        comments.map((c) =>
-          c._id === commentId
-            ? {
-                ...c,
-                isLiked: !isLiked,
-                likesCount: isLiked
-                  ? Math.max(0, c.likesCount - 1)
-                  : c.likesCount + 1,
-              }
-            : c
-        )
+      setComments(prevComments =>
+        prevComments.map(c => {
+          if (c._id === commentId) {
+            const isCurrentlyLiked = c.isLiked || false
+            return {
+              ...c,
+              isLiked: !isCurrentlyLiked,
+              likesCount: isCurrentlyLiked
+                ? Math.max(0, (c.likesCount || 0) - 1)
+                : (c.likesCount || 0) + 1,
+            }
+          }
+          // Check replies
+          if (c.replies) {
+            return {
+              ...c,
+              replies: c.replies.map(r =>
+                r._id === commentId
+                  ? {
+                      ...r,
+                      isLiked: !r.isLiked,
+                      likesCount: r.isLiked
+                        ? Math.max(0, (r.likesCount || 0) - 1)
+                        : (r.likesCount || 0) + 1,
+                    }
+                  : r
+              ),
+            }
+          }
+          return c
+        })
       )
+      
       // API call
-      if (!isLiked) {
+      const comment = comments.find(c => 
+        c._id === commentId || c.replies?.some(r => r._id === commentId)
+      )
+      const isCurrentlyLiked = comment?._id === commentId 
+        ? comment.isLiked 
+        : comment?.replies?.find(r => r._id === commentId)?.isLiked
+      
+      if (!isCurrentlyLiked) {
         await likeComment(commentId)
       } else {
         await unlikeComment(commentId)
       }
     } catch (err) {
       console.error("Error toggling like on comment:", err)
+      // Revert optimistic update by refetching
+      await fetchComments(postId, true)
     }
   }
 
   const handleEditComment = (commentId, content) => {
     if (editingCommentId === commentId) {
-      // Cancel edit
       setEditingCommentId(null)
       setEditCommentText("")
     } else {
-      // Start edit
       setEditingCommentId(commentId)
       setEditCommentText(content || "")
     }
@@ -377,29 +405,47 @@ export default function PostView({ postId }) {
 
   const handleCommentSave = async (commentId) => {
     if (!editCommentText?.trim()) return
+    
+    setIsSubmitting(true)
     try {
       await updateComment(commentId, { content: editCommentText })
-      setComments(
-        comments.map((c) =>
-          c._id === commentId ? { ...c, content: editCommentText } : c
-        )
+      // Update local state
+      setComments(prevComments =>
+        prevComments.map(c => {
+          if (c._id === commentId) {
+            return { ...c, content: editCommentText }
+          }
+          if (c.replies) {
+            return {
+              ...c,
+              replies: c.replies.map(r =>
+                r._id === commentId ? { ...r, content: editCommentText } : r
+              ),
+            }
+          }
+          return c
+        })
       )
       setEditingCommentId(null)
       setEditCommentText("")
     } catch (err) {
       console.error("Error updating comment:", err)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const handleDeleteComment = async (commentId) => {
     if (!confirm("Delete this comment?")) return
+    
     setIsSubmitting(true)
     try {
       await deleteComment(commentId)
-      setComments(comments.filter((c) => c._id !== commentId))
       setPost((p) =>
-        p ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p
+        p ? { ...p, commentsCount: Math.max(0, (p.commentsCount || 0) - 1) } : p
       )
+      // Refresh comments
+      await fetchComments(postId, true)
     } catch (err) {
       console.error("Error deleting comment:", err)
     } finally {
@@ -416,6 +462,9 @@ export default function PostView({ postId }) {
       else await unlikePost(postId)
     } catch (err) {
       console.error("Error toggling like:", err)
+      // Revert
+      setIsLiked(!next)
+      setLikesCount((prev) => (next ? prev - 1 : prev + 1))
     }
   }
 
@@ -428,6 +477,9 @@ export default function PostView({ postId }) {
       else await removeBookmark(postId)
     } catch (err) {
       console.error("Error toggling bookmark:", err)
+      // Revert
+      setIsBookmarked(!next)
+      setBookmarksCount((prev) => (next ? prev - 1 : prev + 1))
     }
   }
 
@@ -441,15 +493,20 @@ export default function PostView({ postId }) {
       alert("Could not delete post")
     }
   }
+
   const handleShare = () => {
-    // Implement share functionality
-    if (navigator.share) {
+    if (navigator.share && post) {
       navigator.share({
-        title: post?._id,
-        text: `Check out ${post?.content}`,
+        title: post._id,
+        text: `Check out ${post.content || 'this post'}`,
         url: `${window.location.origin}/posts/${post._id}`,
       })
     }
+  }
+
+  const loadMoreComments = async () => {
+    if (!hasMore || isLoading) return
+    await fetchComments(postId, false)
   }
 
   const getInitials = (username) => {
@@ -457,10 +514,10 @@ export default function PostView({ postId }) {
   }
 
   const postDate = post?.createdAt ? new Date(post.createdAt) : null
-
   const timeAgo = isValid(postDate)
     ? formatDistanceToNow(postDate, { addSuffix: true })
     : "Just now"
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -470,6 +527,8 @@ export default function PostView({ postId }) {
   }
 
   if (!post) return null
+
+  const ownPost = currentUserId === post.authorId?._id
 
   return (
     <div className="min-h-screen rounded-t-full bg-background">
@@ -571,11 +630,11 @@ export default function PostView({ postId }) {
             <div className="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground">
               <div className="flex items-center space-x-2">
                 <Eye className="h-3 w-3" />
-                <span>{post.viewCount} views</span>
+                <span>{post.viewCount || 0} views</span>
               </div>
               <div className="flex items-center space-x-4">
                 <span>{likesCount} likes</span>
-                <span>{post.commentsCount} comments</span>
+                <span>{post.commentsCount || 0} comments</span>
                 <span>{bookmarksCount} saves</span>
               </div>
             </div>
@@ -628,7 +687,7 @@ export default function PostView({ postId }) {
         {/* Comments Section */}
         <div className="mt-6 border-t pt-6">
           <h3 className="mb-4 font-semibold">
-            Comments ({post.commentsCount})
+            Comments ({post.commentsCount || 0})
           </h3>
 
           {/* Add Comment Input */}
@@ -681,9 +740,14 @@ export default function PostView({ postId }) {
               ))
             )}
 
-            {hasMore && (
+            {hasMore && comments.length > 0 && (
               <div className="flex justify-center pt-4">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={loadMoreComments}
+                  disabled={isLoading}
+                >
                   Load More Comments
                 </Button>
               </div>

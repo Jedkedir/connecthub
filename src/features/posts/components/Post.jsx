@@ -8,14 +8,8 @@ import {
   Bookmark,
   Share2,
   Eye,
-  MoreHorizontal,
+
 } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"

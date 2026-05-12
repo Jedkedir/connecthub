@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { FaHeart, FaShareAlt } from "react-icons/fa"
 import { FaBookmark } from "react-icons/fa6"
 import { PiSquaresFourFill } from "react-icons/pi"
