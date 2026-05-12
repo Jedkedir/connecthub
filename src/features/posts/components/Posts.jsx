@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import Post from "./Post"
 import { usePosts } from "../hooks/usePosts"
+import { set } from "date-fns"
+
 
 export default function Posts({ user }) {
   const { getUserPosts } = usePosts()

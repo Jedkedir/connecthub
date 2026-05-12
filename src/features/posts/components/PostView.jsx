@@ -24,7 +24,7 @@ import { formatDistanceToNow,isValid,parseISO } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "@/features/auth"
-
+import { Link } from "react-router-dom"
 
 function Comment({ comment, onReply, onLikeComment }) {
   const [isLiked, setIsLiked] = useState(false)
@@ -54,13 +54,14 @@ if (comment?.createdAt) {
 
   return (
     <div className={`flex space-x-3 ${avaterSide === "right" ? "flex-row-reverse" : ""} gap-1 items-center`}>
-      
+      <Link to={`/profile/${comment.userId?._id}`}>
       <Avatar className="size-10">
         <AvatarImage src={comment.userId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
         <AvatarFallback>
           {comment.userId?.username?.slice(0, 2).toUpperCase() || "User"}
         </AvatarFallback>
       </Avatar>
+      </Link>
       <div className="flex-1">
         <div className="rounded-lg bg-muted p-3">
           <div className="flex items-center justify-between">
@@ -281,10 +282,12 @@ const timeAgo = isValid(postDate)
         <Card className="border-0 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 px-0">
             <div className="flex items-center space-x-3">
+              <Link to={`/profile/${post.authorId?._id}`}>
               <Avatar>
                 <AvatarImage src={post.authorId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
                 <AvatarFallback>{getInitials(post.authorId?.username)}</AvatarFallback>
               </Avatar>
+              </Link>
               <div>
                 <p className="text-sm font-semibold">@{post.authorId?.username}</p>
                 <p className="text-xs text-muted-foreground">{timeAgo}</p>

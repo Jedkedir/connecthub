@@ -22,4 +22,14 @@ export const followService = {
       .post(endpoints.follow.unfollow, { targetUserId })
       .then((response) => response.data)
   },
+  getFollowers(userId) {
+    return api
+      .get(endpoints.follow.followers(userId))
+      .then((response) => response.data)
+  },
+  getFollowing(userId) {
+    return api
+      .get(endpoints.follow.following(userId))
+      .then((response) => response.data)
+  },
 }

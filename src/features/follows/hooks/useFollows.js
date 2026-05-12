@@ -15,6 +15,8 @@ export function useFollows() {
   )
   const unfollowUserAction = useAsyncAction(followService.unfollowUser)
 
+  const getFollowersAction = useAsyncAction(followService.getFollowers)
+  const getFollowingAction = useAsyncAction(followService.getFollowing)
   return useMemo(
     () => ({
       acceptFollowRequest: acceptFollowRequestAction.execute,
@@ -25,6 +27,10 @@ export function useFollows() {
       sendFollowRequestState: sendFollowRequestAction,
       unfollowUser: unfollowUserAction.execute,
       unfollowUserState: unfollowUserAction,
+      getFollowers: getFollowersAction.execute,
+      getFollowersState: getFollowersAction,
+      getFollowing: getFollowingAction.execute,
+      getFollowingState: getFollowingAction,
     }),
     [
       acceptFollowRequestAction,

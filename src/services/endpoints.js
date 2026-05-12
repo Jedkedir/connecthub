@@ -15,6 +15,8 @@ export const endpoints = {
     reject: "/follow/reject",
     request: "/follow/request",
     unfollow: "/follow/unfollow",
+    followers: (userId) => `/follow/${userId}/followers`,
+    following: (userId) => `/follow/${userId}/following`,
   },
   health: "/health",
   notifications: {

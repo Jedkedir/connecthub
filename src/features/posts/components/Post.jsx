@@ -20,6 +20,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
+import { Link } from "react-router-dom"
 export default function Post({
   post
 }) 
@@ -74,17 +75,19 @@ export default function Post({
       {/* Post Header */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center space-x-3">
-          <Avatar>
-            <AvatarImage
-              src={
-                post?.authorId?.profilePic ||
-                `https://api.dicebear.com/7.x/avataaars/svg?seed=${post?.authorId?.username}`
-              }
-            />
-            <AvatarFallback>
-              {getInitials(post?.authorId?.username || "User")}
-            </AvatarFallback>
-          </Avatar>
+          <Link to={`/profile/${post?.authorId?._id}`}>
+            <Avatar>
+              <AvatarImage
+                src={
+                  post?.authorId?.profilePic ||
+                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${post?.authorId?.username}`
+                }
+              />
+              <AvatarFallback>
+                {getInitials(post?.authorId?.username || "User")}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           <div>
             <p className="text-sm font-semibold">@{post?.authorId?.username}</p>
             <p className="text-xs text-muted-foreground">{timeAgo}</p>
