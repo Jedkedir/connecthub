@@ -9,9 +9,9 @@ import {
   Bookmark,
   Share2,
   Eye,
-  MoreHorizontal,
   Send,
   ArrowLeft,
+  MoreHorizontal,
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -26,8 +26,20 @@ import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "@/features/auth"
 import { Link } from "react-router-dom"
 
-function Comment({ comment, onReply, onLikeComment }) {
-  const [isLiked, setIsLiked] = useState(false)
+function Comment({
+  comment,
+  onReply,
+  onLikeComment,
+  onEdit,
+  onSave,
+  onDelete,
+  editingId,
+  editText,
+  setEditText,
+  currentUserId,
+  isReply = false,
+}) {
+  const [isLiked, setIsLiked] = useState(comment?.isLiked || false)
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState("")
 
@@ -46,11 +58,11 @@ function Comment({ comment, onReply, onLikeComment }) {
       setShowReplyInput(false)
     }
   }
-  const currentUserId = useAuthStore((state) => state.user?._id)
   let avaterSide = "left"
   if (currentUserId == comment.userId?._id) {
     avaterSide = "right"
   }
+  const isOwnComment = currentUserId === comment.userId?._id
 
   return (
     <div
@@ -75,31 +87,89 @@ function Comment({ comment, onReply, onLikeComment }) {
             <p className="text-sm font-semibold">
               @{comment.userId?.username || "user"}
             </p>
-            <p className="text-xs text-muted-foreground">{timeAgo}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">{timeAgo}</p>
+              {isOwnComment && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0.5 text-muted-foreground"
+                    >
+                      <MoreHorizontal className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => onEdit(comment._id, comment.content)}
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDelete(comment._id)}>
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
-          <p className="mt-1 text-sm">{comment.content}</p>
+          {editingId === comment._id ? (
+            <Textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              className="mt-2 text-sm"
+              rows={2}
+            />
+          ) : (
+            <p className="mt-1 text-sm">{comment.content}</p>
+          )}
         </div>
+        {editingId === comment._id && (
+          <div className="mt-2 ml-2 flex gap-2">
+            <Button
+              size="sm"
+              onClick={() => onSave(comment._id)}
+              className="h-auto py-1 text-xs"
+            >
+              Save
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onEdit(null)}
+              className="h-auto py-1 text-xs"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
         <div className="mt-1 ml-2 flex items-center space-x-4">
           <Button
             variant="ghost"
             size="sm"
-            className="h-auto p-0 text-xs"
-            onClick={() => onLikeComment?.(comment._id)}
+            className={`h-auto p-0 text-xs ${isLiked ? "text-red-500" : ""}`}
+            onClick={() => {
+              setIsLiked(!isLiked)
+              onLikeComment?.(comment._id)
+            }}
           >
             <Heart
-              className={`mr-1 h-3 w-3 ${isLiked ? "fill-current text-red-500" : ""}`}
+              className={`mr-1 h-3 w-3 ${isLiked ? "fill-current" : ""}`}
             />
             {comment.likesCount || 0}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-auto p-0 text-xs"
-            onClick={() => setShowReplyInput(!showReplyInput)}
-          >
-            <MessageCircle className="mr-1 h-3 w-3" />
-            Reply
-          </Button>
+          {!isReply && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto p-0 text-xs"
+              onClick={() => setShowReplyInput(!showReplyInput)}
+            >
+              <MessageCircle className="mr-1 h-3 w-3" />
+              Reply
+            </Button>
+          )}
         </div>
         {showReplyInput && (
           <div className="mt-2 flex items-start space-x-2">
@@ -118,7 +188,20 @@ function Comment({ comment, onReply, onLikeComment }) {
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-2 ml-6 space-y-2">
             {comment.replies.map((reply) => (
-              <Comment key={reply._id} comment={reply} onReply={onReply} />
+              <Comment
+                key={reply._id}
+                comment={reply}
+                onReply={onReply}
+                onLikeComment={onLikeComment}
+                onEdit={onEdit}
+                onSave={onSave}
+                onDelete={onDelete}
+                editingId={editingId}
+                editText={editText}
+                setEditText={setEditText}
+                currentUserId={currentUserId}
+                isReply={true}
+              />
             ))}
           </div>
         )}
@@ -138,6 +221,8 @@ export default function PostView({ postId }) {
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
   const [bookmarksCount, setBookmarksCount] = useState(0)
+  const [editingCommentId, setEditingCommentId] = useState(null)
+  const [editCommentText, setEditCommentText] = useState("")
   const currentUserId = useAuthStore((state) => state.user?._id)
   let ownPost = false
   if (currentUserId == post?.authorId?._id) {
@@ -149,10 +234,15 @@ export default function PostView({ postId }) {
     getPostById,
     getComments,
     addComment,
+    addReply,
     bookmarkPost,
     removeBookmark,
     likePost,
     unlikePost,
+    likeComment,
+    unlikeComment,
+    updateComment,
+    deleteComment,
     deletePost,
   } = usePosts()
 
@@ -161,7 +251,6 @@ export default function PostView({ postId }) {
     setIsLoading(true)
     try {
       const { data } = await getPostById(id)
-      console.log("Fetched post data:", data)
       setPost(data.post)
       setLikesCount(data.post.likesCount || 0)
       setBookmarksCount(data.post.bookmarksCount || 0)
@@ -176,8 +265,8 @@ export default function PostView({ postId }) {
   const fetchComments = async (id) => {
     if (!id) return
     try {
-      const data = await getComments(id)
-      setComments(data.data || [])
+      const { data } = await getComments(id)
+      setComments(data || [])
     } catch (err) {
       console.error("Error fetching comments:", err)
     }
@@ -214,9 +303,108 @@ export default function PostView({ postId }) {
     }
   }
 
-  const handleAddReply = async (commentId, content) => {
-    // TODO: implement reply API
-    console.log("reply", commentId, content)
+  const handleAddReply = async (parentCommentId, content) => {
+    if (!content.trim()) return
+    setIsSubmitting(true)
+    try {
+      const created = await addReply(postId, { parentCommentId, content })
+      const newReply = created || {
+        _id: Date.now().toString(),
+        userId: { _id: currentUserId, username: "me", profilePic: null },
+        content,
+        createdAt: new Date().toISOString(),
+        likesCount: 0,
+      }
+      // Update comments with new reply nested under parent
+      setComments(
+        comments.map((c) =>
+          c._id === parentCommentId
+            ? {
+                ...c,
+                replies: [newReply, ...(c.replies || [])],
+              }
+            : c
+        )
+      )
+    } catch (err) {
+      console.error("Error adding reply:", err)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleLikeComment = async (commentId) => {
+    try {
+      const updatedComment = comments.find((c) => c._id === commentId)
+      if (!updatedComment) return
+      const isLiked = updatedComment.isLiked
+      // Optimistic update
+      setComments(
+        comments.map((c) =>
+          c._id === commentId
+            ? {
+                ...c,
+                isLiked: !isLiked,
+                likesCount: isLiked
+                  ? Math.max(0, c.likesCount - 1)
+                  : c.likesCount + 1,
+              }
+            : c
+        )
+      )
+      // API call
+      if (!isLiked) {
+        await likeComment(commentId)
+      } else {
+        await unlikeComment(commentId)
+      }
+    } catch (err) {
+      console.error("Error toggling like on comment:", err)
+    }
+  }
+
+  const handleEditComment = (commentId, content) => {
+    if (editingCommentId === commentId) {
+      // Cancel edit
+      setEditingCommentId(null)
+      setEditCommentText("")
+    } else {
+      // Start edit
+      setEditingCommentId(commentId)
+      setEditCommentText(content || "")
+    }
+  }
+
+  const handleCommentSave = async (commentId) => {
+    if (!editCommentText?.trim()) return
+    try {
+      await updateComment(commentId, { content: editCommentText })
+      setComments(
+        comments.map((c) =>
+          c._id === commentId ? { ...c, content: editCommentText } : c
+        )
+      )
+      setEditingCommentId(null)
+      setEditCommentText("")
+    } catch (err) {
+      console.error("Error updating comment:", err)
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    if (!confirm("Delete this comment?")) return
+    setIsSubmitting(true)
+    try {
+      await deleteComment(commentId)
+      setComments(comments.filter((c) => c._id !== commentId))
+      setPost((p) =>
+        p ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p
+      )
+    } catch (err) {
+      console.error("Error deleting comment:", err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleLike = async () => {
@@ -251,6 +439,16 @@ export default function PostView({ postId }) {
     } catch (err) {
       console.error("Error deleting post:", err)
       alert("Could not delete post")
+    }
+  }
+  const handleShare = () => {
+    // Implement share functionality
+    if (navigator.share) {
+      navigator.share({
+        title: post?._id,
+        text: `Check out ${post?.content}`,
+        url: `${window.location.origin}/posts/${post._id}`,
+      })
     }
   }
 
@@ -419,6 +617,7 @@ export default function PostView({ postId }) {
               variant="ghost"
               size="sm"
               className="flex items-center gap-2"
+              onClick={handleShare}
             >
               <Share2 className="h-4 w-4" />
               Share
@@ -470,6 +669,14 @@ export default function PostView({ postId }) {
                   key={comment._id}
                   comment={comment}
                   onReply={handleAddReply}
+                  onLikeComment={handleLikeComment}
+                  onEdit={handleEditComment}
+                  onSave={handleCommentSave}
+                  onDelete={handleDeleteComment}
+                  editingId={editingCommentId}
+                  editText={editCommentText}
+                  setEditText={setEditCommentText}
+                  currentUserId={currentUserId}
                 />
               ))
             )}

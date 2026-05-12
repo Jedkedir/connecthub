@@ -34,6 +34,13 @@ export const endpoints = {
     like: (id) => `/posts/${id}/like`,
     bookmark: (id) => `/posts/${id}/bookmark`,
     unlike: (id) => `/posts/${id}/unlike`,
+    comment: {
+      like: (commentId) => `/posts/comments/${commentId}/like`,
+      unlike: (commentId) => `/posts/comments/${commentId}/unlike`,
+      update: (commentId) => `/posts/comments/${commentId}`,
+      delete: (commentId) => `/posts/comments/${commentId}`,
+      replies: (commentId) => `/posts/comments/${commentId}/replies`,
+    },
   },
   users: {
     byId: (id) => `/users/${id}`,

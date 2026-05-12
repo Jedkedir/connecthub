@@ -105,7 +105,10 @@ export default function Follow({ user, currentUser, showActions = true }) {
             <Avatar className="h-12 w-12 flex-shrink-0 transition-transform group-hover:scale-105 sm:h-14 sm:w-14">
               {userData.profilePic ? (
                 <AvatarImage
-                  src={userData.profilePic}
+                  src={
+                    userData.profilePic ||
+                    "https://api.dicebear.com/9.x/adventurer-neutral/svg"
+                  }
                   alt={userData.username}
                 />
               ) : null}

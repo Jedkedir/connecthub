@@ -20,7 +20,6 @@ const avatarUrl = (seed) => {
 
 function createAvatarUrl(username) {
   const avatar = avatarUrl(username)
-  console.log(`Generated avatar URL for ${username}: ${avatar}`)
   return avatar
 }
 

@@ -51,8 +51,14 @@ export default function Post({ post }) {
     }
   }
   const handleShare = () => {
-    //TODO
-    console.log("Shared post")
+    // Implement share functionality
+    if (navigator.share) {
+      navigator.share({
+        title: post?._id,
+        text: `Check out ${post?.content}`,
+        url: `${window.location.origin}/posts/${post._id}`,
+      })
+    }
   }
   const handlePostDetail = () => {
     navigate(`/posts/${post._id}`)

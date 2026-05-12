@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { FaHeart, FaShareAlt } from "react-icons/fa"
 import { FaBookmark } from "react-icons/fa6"
 import { PiSquaresFourFill } from "react-icons/pi"
@@ -132,7 +132,7 @@ export default function ProfileView({ userId }) {
 
         if (userData) {
           setProfile(userData)
-          setIsFollowing(!!isFollowed)
+          setIsFollowing(userData.isFollowing || isFollowed)
         } else {
           console.error("No user data found in response:", response)
           setProfile(null)

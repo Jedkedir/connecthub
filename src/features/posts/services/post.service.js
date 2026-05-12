@@ -58,4 +58,34 @@ export const postService = {
       .post(endpoints.posts.unlike(id))
       .then((response) => response.data)
   },
+  addReply(postId, payload) {
+    return api
+      .post(endpoints.posts.comments(postId), payload)
+      .then((response) => response.data)
+  },
+  likeComment(commentId) {
+    return api
+      .post(endpoints.posts.comment.like(commentId))
+      .then((response) => response.data)
+  },
+  unlikeComment(commentId) {
+    return api
+      .post(endpoints.posts.comment.unlike(commentId))
+      .then((response) => response.data)
+  },
+  updateComment(commentId, payload) {
+    return api
+      .put(endpoints.posts.comment.update(commentId), payload)
+      .then((response) => response.data)
+  },
+  deleteComment(commentId) {
+    return api
+      .delete(endpoints.posts.comment.delete(commentId))
+      .then((response) => response.data)
+  },
+  getCommentReplies(commentId, params) {
+    return api
+      .get(endpoints.posts.comment.replies(commentId), { params })
+      .then((response) => response.data)
+  },
 }
