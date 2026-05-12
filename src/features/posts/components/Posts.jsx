@@ -3,7 +3,6 @@ import Post from "./Post"
 import { usePosts } from "../hooks/usePosts"
 import { set } from "date-fns"
 
-
 export default function Posts({ user }) {
   const { getUserPosts } = usePosts()
   const [posts, setPosts] = useState([])
@@ -34,10 +33,12 @@ export default function Posts({ user }) {
   if (isLoading) return <div className="text-center">Loading...</div>
 
   if (!posts || posts.length === 0) {
-    return <div className="text-center text-muted-foreground">No posts yet.</div>
+    return (
+      <div className="text-center text-muted-foreground">No posts yet.</div>
+    )
   }
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-4 w-full">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {posts.map((post) => (
         <Post key={post._id} post={post} />
       ))}

@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import {Separator} from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator"
 import {
   Heart,
   MessageCircle,
@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useState, useEffect } from "react"
-import { formatDistanceToNow,isValid,parseISO } from "date-fns"
+import { formatDistanceToNow, isValid, parseISO } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "@/features/auth"
@@ -31,13 +31,13 @@ function Comment({ comment, onReply, onLikeComment }) {
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState("")
 
-  let timeAgo = "Just now"; // or some default string
+  let timeAgo = "Just now" // or some default string
 
-if (comment?.createdAt) {
-  timeAgo = formatDistanceToNow(parseISO(comment.createdAt), {
-    addSuffix: true,
-  });
-}
+  if (comment?.createdAt) {
+    timeAgo = formatDistanceToNow(parseISO(comment.createdAt), {
+      addSuffix: true,
+    })
+  }
 
   const handleSubmitReply = () => {
     if (replyContent.trim()) {
@@ -49,35 +49,46 @@ if (comment?.createdAt) {
   const currentUserId = useAuthStore((state) => state.user?._id)
   let avaterSide = "left"
   if (currentUserId == comment.userId?._id) {
-      avaterSide = "right"
+    avaterSide = "right"
   }
 
   return (
-    <div className={`flex space-x-3 ${avaterSide === "right" ? "flex-row-reverse" : ""} gap-1 items-center`}>
+    <div
+      className={`flex space-x-3 ${avaterSide === "right" ? "flex-row-reverse" : ""} items-center gap-1`}
+    >
       <Link to={`/profile/${comment.userId?._id}`}>
-      <Avatar className="size-10">
-        <AvatarImage src={comment.userId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
-        <AvatarFallback>
-          {comment.userId?.username?.slice(0, 2).toUpperCase() || "User"}
-        </AvatarFallback>
-      </Avatar>
+        <Avatar className="size-10">
+          <AvatarImage
+            src={
+              comment.userId?.profilePic ||
+              "https://api.dicebear.com/9.x/adventurer-neutral/svg"
+            }
+          />
+          <AvatarFallback>
+            {comment.userId?.username?.slice(0, 2).toUpperCase() || "User"}
+          </AvatarFallback>
+        </Avatar>
       </Link>
       <div className="flex-1">
         <div className="rounded-lg bg-muted p-3">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold">@{comment.userId?.username || "user"}</p>
+            <p className="text-sm font-semibold">
+              @{comment.userId?.username || "user"}
+            </p>
             <p className="text-xs text-muted-foreground">{timeAgo}</p>
           </div>
-          <p className="text-sm mt-1">{comment.content}</p>
+          <p className="mt-1 text-sm">{comment.content}</p>
         </div>
-        <div className="flex items-center space-x-4 mt-1 ml-2">
+        <div className="mt-1 ml-2 flex items-center space-x-4">
           <Button
             variant="ghost"
             size="sm"
             className="h-auto p-0 text-xs"
             onClick={() => onLikeComment?.(comment._id)}
           >
-            <Heart className={`h-3 w-3 mr-1 ${isLiked ? "fill-current text-red-500" : ""}`} />
+            <Heart
+              className={`mr-1 h-3 w-3 ${isLiked ? "fill-current text-red-500" : ""}`}
+            />
             {comment.likesCount || 0}
           </Button>
           <Button
@@ -86,7 +97,7 @@ if (comment?.createdAt) {
             className="h-auto p-0 text-xs"
             onClick={() => setShowReplyInput(!showReplyInput)}
           >
-            <MessageCircle className="h-3 w-3 mr-1" />
+            <MessageCircle className="mr-1 h-3 w-3" />
             Reply
           </Button>
         </div>
@@ -105,7 +116,7 @@ if (comment?.createdAt) {
           </div>
         )}
         {comment.replies && comment.replies.length > 0 && (
-          <div className="ml-6 mt-2 space-y-2">
+          <div className="mt-2 ml-6 space-y-2">
             {comment.replies.map((reply) => (
               <Comment key={reply._id} comment={reply} onReply={onReply} />
             ))}
@@ -130,9 +141,9 @@ export default function PostView({ postId }) {
   const currentUserId = useAuthStore((state) => state.user?._id)
   let ownPost = false
   if (currentUserId == post?.authorId?._id) {
-      ownPost = true
-  } 
-  
+    ownPost = true
+  }
+
   const navigate = useNavigate()
   const {
     getPostById,
@@ -149,10 +160,12 @@ export default function PostView({ postId }) {
     if (!id) return
     setIsLoading(true)
     try {
-      const data = await getPostById(id)
-      setPost(data.data.post)
-      setLikesCount(data.data?.likesCount || 0)
-      setBookmarksCount(data.data?.bookmarksCount || 0)
+      const { data } = await getPostById(id)
+      console.log("Fetched post data:", data)
+      setPost(data.post)
+      setLikesCount(data.post.likesCount || 0)
+      setBookmarksCount(data.post.bookmarksCount || 0)
+      setIsBookmarked(data.post.isBookmarked || false)
     } catch (err) {
       console.error("Error fetching post:", err)
     } finally {
@@ -173,7 +186,7 @@ export default function PostView({ postId }) {
     if (!postId) return
     fetchPost(postId)
     fetchComments(postId)
-  }, [postId,isSubmitting])
+  }, [postId, isSubmitting])
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return
@@ -191,7 +204,9 @@ export default function PostView({ postId }) {
       }
       setComments([newCommentObj, ...comments])
       setNewComment("")
-      setPost((p) => (p ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p))
+      setPost((p) =>
+        p ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
+      )
     } catch (err) {
       console.error("Error adding comment:", err)
     } finally {
@@ -243,15 +258,15 @@ export default function PostView({ postId }) {
     return username?.slice(0, 2).toUpperCase() || "U"
   }
 
-const postDate = post?.createdAt ? new Date(post.createdAt) : null;
+  const postDate = post?.createdAt ? new Date(post.createdAt) : null
 
-const timeAgo = isValid(postDate) 
-  ? formatDistanceToNow(postDate, { addSuffix: true }) 
-  : "Just now";
+  const timeAgo = isValid(postDate)
+    ? formatDistanceToNow(postDate, { addSuffix: true })
+    : "Just now"
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -259,10 +274,10 @@ const timeAgo = isValid(postDate)
   if (!post) return null
 
   return (
-    <div className="min-h-screen bg-background rounded-t-full">
+    <div className="min-h-screen rounded-t-full bg-background">
       {/* Header with back button */}
-      <div className="sticky top-0 z-10 bg-background border-b">
-        <div className="container max-w-4xl mx-auto px-4">
+      <div className="sticky top-0 z-10 border-b bg-background">
+        <div className="container mx-auto max-w-4xl px-4">
           <div className="flex items-center space-x-4 py-4">
             <Button
               variant="ghost"
@@ -276,20 +291,29 @@ const timeAgo = isValid(postDate)
           </div>
         </div>
       </div>
-      
-      <div className="container max-w-4xl mx-auto px-4 py-6">
+
+      <div className="container mx-auto max-w-4xl px-4 py-6">
         {/* Post Content */}
         <Card className="border-0 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 px-0">
             <div className="flex items-center space-x-3">
               <Link to={`/profile/${post.authorId?._id}`}>
-              <Avatar>
-                <AvatarImage src={post.authorId?.profilePic || "https://api.dicebear.com/9.x/adventurer-neutral/svg"} />
-                <AvatarFallback>{getInitials(post.authorId?.username)}</AvatarFallback>
-              </Avatar>
+                <Avatar>
+                  <AvatarImage
+                    src={
+                      post.authorId?.profilePic ||
+                      "https://api.dicebear.com/9.x/adventurer-neutral/svg"
+                    }
+                  />
+                  <AvatarFallback>
+                    {getInitials(post.authorId?.username)}
+                  </AvatarFallback>
+                </Avatar>
               </Link>
               <div>
-                <p className="text-sm font-semibold">@{post.authorId?.username}</p>
+                <p className="text-sm font-semibold">
+                  @{post.authorId?.username}
+                </p>
                 <p className="text-xs text-muted-foreground">{timeAgo}</p>
               </div>
             </div>
@@ -301,12 +325,16 @@ const timeAgo = isValid(postDate)
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {ownPost && <DropdownMenuItem onClick={handleDeletePost}>Delete Post</DropdownMenuItem>}
+                {ownPost && (
+                  <DropdownMenuItem onClick={handleDeletePost}>
+                    Delete Post
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>Report Post</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </CardHeader>
-          <Separator/>
+          <Separator />
           <CardContent className="space-y-3 px-0">
             {post.content && <p className="text-sm">{post.content}</p>}
 
@@ -317,15 +345,17 @@ const timeAgo = isValid(postDate)
                   post.mediaUrls.length === 1
                     ? "grid-cols-1"
                     : post.mediaUrls.length === 2
-                    ? "grid-cols-2"
-                    : "grid-cols-2"
+                      ? "grid-cols-2"
+                      : "grid-cols-2"
                 }`}
               >
                 {post.mediaUrls.map((url, idx) => (
                   <div
                     key={idx}
                     className={`relative overflow-hidden rounded-lg ${
-                      post.mediaUrls.length === 3 && idx === 0 ? "row-span-2" : ""
+                      post.mediaUrls.length === 3 && idx === 0
+                        ? "row-span-2"
+                        : ""
                     }`}
                   >
                     <img
@@ -354,22 +384,42 @@ const timeAgo = isValid(postDate)
           </CardContent>
 
           <CardFooter className="flex justify-between px-0">
-            <Button variant="ghost" size="sm" className={`flex items-center gap-2 ${isLiked ? "text-red-500" : ""}`} onClick={handleLike}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`flex items-center gap-2 ${isLiked ? "text-red-500" : ""}`}
+              onClick={handleLike}
+            >
               <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
               Like
             </Button>
 
-            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2"
+            >
               <MessageCircle className="h-4 w-4" />
               Comment
             </Button>
 
-            <Button variant="ghost" size="sm" className={`flex items-center gap-2 ${isBookmarked ? "text-yellow-500" : ""}`} onClick={handleBookmark}>
-              <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`flex items-center gap-2 ${isBookmarked ? "text-yellow-500" : ""}`}
+              onClick={handleBookmark}
+            >
+              <Bookmark
+                className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
+              />
               Save
             </Button>
 
-            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2"
+            >
               <Share2 className="h-4 w-4" />
               Share
             </Button>
@@ -377,19 +427,31 @@ const timeAgo = isValid(postDate)
         </Card>
 
         {/* Comments Section */}
-        <div className="border-t mt-6 pt-6">
-          <h3 className="font-semibold mb-4">Comments ({post.commentsCount})</h3>
+        <div className="mt-6 border-t pt-6">
+          <h3 className="mb-4 font-semibold">
+            Comments ({post.commentsCount})
+          </h3>
 
           {/* Add Comment Input */}
-          <div className="flex space-x-3 mb-6">
+          <div className="mb-6 flex space-x-3">
             <Avatar className="h-8 w-8">
               <AvatarFallback>ME</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <Textarea placeholder="Write a comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)} className="text-sm" rows={3} />
-              <div className="flex justify-end mt-2">
-                <Button size="sm" onClick={handleAddComment} disabled={isSubmitting || !newComment.trim()}>
-                  <Send className="h-3 w-3 mr-1" />
+              <Textarea
+                placeholder="Write a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="text-sm"
+                rows={3}
+              />
+              <div className="mt-2 flex justify-end">
+                <Button
+                  size="sm"
+                  onClick={handleAddComment}
+                  disabled={isSubmitting || !newComment.trim()}
+                >
+                  <Send className="mr-1 h-3 w-3" />
                   Post Comment
                 </Button>
               </div>
@@ -399,14 +461,24 @@ const timeAgo = isValid(postDate)
           {/* Comments List */}
           <div className="space-y-4">
             {comments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No comments yet. Be the first to comment!</p>
+              <p className="py-8 text-center text-muted-foreground">
+                No comments yet. Be the first to comment!
+              </p>
             ) : (
-              comments.map((comment) => <Comment key={comment._id} comment={comment} onReply={handleAddReply} />)
+              comments.map((comment) => (
+                <Comment
+                  key={comment._id}
+                  comment={comment}
+                  onReply={handleAddReply}
+                />
+              ))
             )}
 
             {hasMore && (
               <div className="flex justify-center pt-4">
-                <Button variant="outline" size="sm">Load More Comments</Button>
+                <Button variant="outline" size="sm">
+                  Load More Comments
+                </Button>
               </div>
             )}
           </div>

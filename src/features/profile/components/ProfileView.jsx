@@ -41,7 +41,7 @@ export default function ProfileView({ userId }) {
   const [postCount, setPostCount] = useState(0)
   const [isFollowing, setIsFollowing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  
+
   const authenticatedUserProfile = currentUser?._id === userId
 
   const { getUserById, getCurrentUser } = useProfile()
@@ -98,16 +98,16 @@ export default function ProfileView({ userId }) {
     }
   }
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchProfile = async () => {
       setIsLoading(true)
       try {
         const response = await getProfile(userId)
-        
+
         // Handle different response structures
         let userData = null
         let isFollowed = false
-        
+
         // Check if response has a data property (axios response)
         if (response?.data) {
           const responseData = response.data
@@ -118,7 +118,7 @@ export default function ProfileView({ userId }) {
             userData = responseData
             isFollowed = responseData.isFollowing || false
           }
-        } 
+        }
         // Check if response directly has user property
         else if (response?.user) {
           userData = response.user
@@ -129,7 +129,7 @@ export default function ProfileView({ userId }) {
           userData = response
           isFollowed = response.isFollowing || false
         }
-        
+
         if (userData) {
           setProfile(userData)
           setIsFollowing(!!isFollowed)
@@ -144,11 +144,11 @@ export default function ProfileView({ userId }) {
         setIsLoading(false)
       }
     }
-    
+
     if (userId) {
       fetchProfile()
     }
-  }, [userId, authenticatedUserProfile, currentUser]) 
+  }, [userId, authenticatedUserProfile, currentUser])
 
   // Loading state
   if (isLoading) {
@@ -196,41 +196,56 @@ export default function ProfileView({ userId }) {
           <div className="flex flex-row items-center justify-between p-6">
             <Avatar className="-mt-20 size-24 rounded-xl border-4 border-background md:size-40">
               <AvatarImage
-                src={profile?.profilePic ?? "https://api.dicebear.com/9.x/adventurer-neutral/svg"}
+                src={
+                  profile?.profilePic ??
+                  "https://api.dicebear.com/9.x/adventurer-neutral/svg"
+                }
                 alt={profile?.username ?? "User"}
               />
-              <AvatarFallback className="bg-primary/10 text-primary text-sm sm:text-base">
-                {profile?.username ? profile.username.charAt(0).toUpperCase() : "U"}
+              <AvatarFallback className="bg-primary/10 text-sm text-primary sm:text-base">
+                {profile?.username
+                  ? profile.username.charAt(0).toUpperCase()
+                  : "U"}
               </AvatarFallback>
             </Avatar>
-              <div className="flex flex-row gap-2">
-                {authenticatedUserProfile && (
-                  <Button className = {cn(isActive === "editProfile" && "bg-accent")}type="button" variant="outline" onClick={displayEditProfile}>
-                    Edit Profile
-                  </Button>
-                )}
-                {
-                  !authenticatedUserProfile && isFollowing && (
-                    <Button size="sm" variant="outline" onClick={handleUnfollow}>
-                      Unfollow
-                    </Button>
-                  )
-                }
-                {
-                  !authenticatedUserProfile && !isFollowing && (
-                    <Button size="sm" variant="default" onClick={handleFollow} disabled={profile?.isPending}>
-                      {profile?.isPending ? "Requested" : "Follow"}
-                    </Button>
-                  )
-                }
+            <div className="flex flex-row gap-2">
+              {authenticatedUserProfile && (
+                <Button
+                  className={cn(isActive === "editProfile" && "bg-accent")}
+                  type="button"
+                  variant="outline"
+                  onClick={displayEditProfile}
+                >
+                  Edit Profile
+                </Button>
+              )}
+              {!authenticatedUserProfile && isFollowing && (
+                <Button size="sm" variant="outline" onClick={handleUnfollow}>
+                  Unfollow
+                </Button>
+              )}
+              {!authenticatedUserProfile && !isFollowing && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={handleFollow}
+                  disabled={profile?.isPending}
+                >
+                  {profile?.isPending ? "Requested" : "Follow"}
+                </Button>
+              )}
 
-
-                {profile && (
-                  <Button size="icon" type="button" variant="outline" onClick={handleShare}>
-                    <FaShareAlt />
-                  </Button>
-                )}
-              </div>
+              {profile && (
+                <Button
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                  onClick={handleShare}
+                >
+                  <FaShareAlt />
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -240,7 +255,9 @@ export default function ProfileView({ userId }) {
           <h2 className="text-2xl font-semibold tracking-normal text-foreground">
             {profile?.username ?? "User Name"}
           </h2>
-          <p className="text-sm text-muted-foreground">{profile?.email ?? ""}</p>
+          <p className="text-sm text-muted-foreground">
+            {profile?.email ?? ""}
+          </p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">
           {profile?.bio ??
@@ -248,11 +265,17 @@ export default function ProfileView({ userId }) {
         </p>
         <div className="flex flex-row items-center gap-8">
           {[
-            [profile?.followerCount ?? "0", "Followers",displayFollowers ],
-            [profile?.followingCount ?? "0", "Following",displayFollowing],
+            [profile?.followerCount ?? "0", "Followers", displayFollowers],
+            [profile?.followingCount ?? "0", "Following", displayFollowing],
             [profile?.postCount ?? "0", "Posts", displayPosts],
-          ].map(([value, label,fn]) => (
-            <Button key={label} className={cn(isActive === label.toLowerCase() && "bg-accent")} onClick={fn} variant="outline" size="sm" >
+          ].map(([value, label, fn]) => (
+            <Button
+              key={label}
+              className={cn(isActive === label.toLowerCase() && "bg-accent")}
+              onClick={fn}
+              variant="outline"
+              size="sm"
+            >
               <p className="text-xl font-semibold">{value}</p>
               <p className="text-sm text-muted-foreground">{label}</p>
             </Button>
@@ -295,7 +318,9 @@ export default function ProfileView({ userId }) {
         {showPosts && <Posts user={profile} setPostCount={setPostCount} />}
         {authenticatedUserProfile && showLikes && <Likes user={profile} />}
         {authenticatedUserProfile && showSaved && <Saved user={profile} />}
-        {authenticatedUserProfile && showEditProfile && <EditProfile user={profile} />}
+        {authenticatedUserProfile && showEditProfile && (
+          <EditProfile user={profile} />
+        )}
         {showFollowers && <Follower userId={userId} />}
         {showFollowing && <Following userId={userId} />}
       </section>

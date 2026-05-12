@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
-import { EyeOffIcon,EyeIcon } from "lucide-react"
+import { EyeOffIcon, EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import {
-  Field,
-  FieldLabel,
-} from "@/components/ui/field"
-import {InputGroup,
-  InputGroupInput,InputGroupButton} from "@/components/ui/input-group"
+  InputGroup,
+  InputGroupInput,
+  InputGroupButton,
+} from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 
 export default function SignupForm({ error, isLoading, onSubmit }) {
@@ -44,19 +44,22 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
           Full name
         </FieldLabel>
         <InputGroup>
-        <InputGroupInput
-          autoComplete="name"
-          id="signup-name"
-          onChange={(event) => setFullName(event.target.value)}
-          placeholder="John Doe"
-          required
-          type="text"
-          value={fullName}
+          <InputGroupInput
+            autoComplete="name"
+            id="signup-name"
+            onChange={(event) => setFullName(event.target.value)}
+            placeholder="John Doe"
+            required
+            type="text"
+            value={fullName}
           />
-          </InputGroup>
+        </InputGroup>
       </Field>
       <Field className="flex flex-col gap-2">
-        <FieldLabel htmlFor="signup-identifier" className="text-muted-foreground">
+        <FieldLabel
+          htmlFor="signup-identifier"
+          className="text-muted-foreground"
+        >
           Email address
         </FieldLabel>
         <InputGroup>
@@ -75,20 +78,24 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
       <Field className="flex flex-col gap-2">
         <FieldLabel htmlFor="signup-password" className="text-muted-foreground">
           Password
-        </FieldLabel> 
+        </FieldLabel>
         <InputGroup>
-        <InputGroupInput
-          id="signup-password"
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          type={showPassword ? "text" : "password"}
-          value={password}
-          placeholder="Enter password"
-        />
-        <InputGroupButton align="inline-end" onClick={togglePasswordVisibility} className="cursor-pointer">
-          {showPassword ? <EyeIcon /> : <EyeOffIcon />}
-        </InputGroupButton>
-      </InputGroup>
+          <InputGroupInput
+            id="signup-password"
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type={showPassword ? "text" : "password"}
+            value={password}
+            placeholder="Enter password"
+          />
+          <InputGroupButton
+            align="inline-end"
+            onClick={togglePasswordVisibility}
+            className="cursor-pointer"
+          >
+            {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+          </InputGroupButton>
+        </InputGroup>
       </Field>
 
       {error ? (

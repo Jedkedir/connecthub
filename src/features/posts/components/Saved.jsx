@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import Post from "./Post"
 import { usePosts } from "../hooks/usePosts"
@@ -43,7 +43,7 @@ export default function Saved() {
   }
   if (bookmarkedPosts.length > 0) {
     return (
-      <div className="mx-auto flex max-w-4xl flex-col gap-4 w-full">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         {bookmarkedPosts.map((post) => {
           return <Post key={post._id} post={post.postId} />
         })}

@@ -93,7 +93,10 @@ export default function Sidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
-              <Link onClick={() => setOpenMobile(false)} to={`/profile/${user?._id}`}>
+              <Link
+                onClick={() => setOpenMobile(false)}
+                to={`/profile/${user?._id}`}
+              >
                 <Avatar className="size-8">
                   <AvatarImage
                     alt={user?.username ?? "User"}

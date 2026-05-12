@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { UserPlus, UserMinus } from "lucide-react"
 
 export default function Follow({ user, currentUser, showActions = true }) {
-  const userData = user || {} 
+  const userData = user || {}
   const { unfollowUser, sendFollowRequest } = useFollows()
   const [isFollowing, setIsFollowing] = useState(userData.isFollowing || false)
   const [isLoading, setIsLoading] = useState(false)
@@ -48,14 +48,19 @@ export default function Follow({ user, currentUser, showActions = true }) {
   const renderButton = () => {
     // Don't show button if it's the current user's own profile
     if (isOwnProfile) return null
-    
+
     // Don't show button if showActions is false
     if (!showActions) return null
     if (userData.isPending) {
       return (
-        <Button size="sm" variant="outline" disabled className="w-full sm:w-auto">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Pending
+        <Button
+          size="sm"
+          variant="outline"
+          disabled
+          className="w-full sm:w-auto"
+        >
+          <UserPlus className="mr-2 h-4 w-4" />
+          Pending
         </Button>
       )
     }
@@ -91,42 +96,51 @@ export default function Follow({ user, currentUser, showActions = true }) {
   return (
     <Card className="w-full transition-all duration-200 hover:shadow-md">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {/* User Info Section - Clickable Link */}
-          <Link 
+          <Link
             to={`/profile/${userData._id}`}
-            className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 group cursor-pointer"
+            className="group flex min-w-0 flex-1 cursor-pointer items-center gap-3 sm:gap-4"
           >
-            <Avatar className="h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0 transition-transform group-hover:scale-105">
+            <Avatar className="h-12 w-12 flex-shrink-0 transition-transform group-hover:scale-105 sm:h-14 sm:w-14">
               {userData.profilePic ? (
-                <AvatarImage src={userData.profilePic} alt={userData.username} />
+                <AvatarImage
+                  src={userData.profilePic}
+                  alt={userData.username}
+                />
               ) : null}
-              <AvatarFallback className="bg-primary/10 text-primary text-sm sm:text-base">
+              <AvatarFallback className="bg-primary/10 text-sm text-primary sm:text-base">
                 {getInitials(userData.username)}
               </AvatarFallback>
             </Avatar>
 
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1">
-                <h3 className="font-semibold text-base sm:text-lg truncate group-hover:text-primary transition-colors">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+                <h3 className="truncate text-base font-semibold transition-colors group-hover:text-primary sm:text-lg">
                   {userData.username}
                 </h3>
                 {userData.email && (
-                  <span className="text-xs sm:text-sm text-muted-foreground truncate">
+                  <span className="truncate text-xs text-muted-foreground sm:text-sm">
                     {userData.email}
                   </span>
                 )}
               </div>
-              
-              <div className="flex gap-4 mt-1 sm:mt-2 flex-wrap">
-                {typeof userData.followersCount === 'number' && (
-                  <span className="text-xs sm:text-sm text-muted-foreground">
-                    <span className="font-semibold text-foreground">{userData.followersCount}</span> followers
+
+              <div className="mt-1 flex flex-wrap gap-4 sm:mt-2">
+                {typeof userData.followersCount === "number" && (
+                  <span className="text-xs text-muted-foreground sm:text-sm">
+                    <span className="font-semibold text-foreground">
+                      {userData.followersCount}
+                    </span>{" "}
+                    followers
                   </span>
                 )}
-                {typeof userData.followingCount === 'number' && (
-                  <span className="text-xs sm:text-sm text-muted-foreground">
-                    <span className="font-semibold text-foreground">{userData.followingCount}</span> following
+                {typeof userData.followingCount === "number" && (
+                  <span className="text-xs text-muted-foreground sm:text-sm">
+                    <span className="font-semibold text-foreground">
+                      {userData.followingCount}
+                    </span>{" "}
+                    following
                   </span>
                 )}
               </div>
@@ -135,7 +149,7 @@ export default function Follow({ user, currentUser, showActions = true }) {
 
           {/* Action Button Section */}
           {renderButton() && (
-            <div className="flex-shrink-0 sm:w-auto w-full">
+            <div className="w-full flex-shrink-0 sm:w-auto">
               {renderButton()}
             </div>
           )}
@@ -150,13 +164,13 @@ export function FollowSkeleton() {
   return (
     <Card className="w-full">
       <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3 sm:gap-4 flex-1">
-            <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 items-center gap-3 sm:gap-4">
+            <Skeleton className="h-12 w-12 rounded-full sm:h-14 sm:w-14" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-5 w-32 sm:w-40" />
               <Skeleton className="h-3 w-24 sm:w-32" />
-              <div className="flex gap-4 mt-1">
+              <div className="mt-1 flex gap-4">
                 <Skeleton className="h-3 w-16 sm:w-20" />
                 <Skeleton className="h-3 w-16 sm:w-20" />
               </div>

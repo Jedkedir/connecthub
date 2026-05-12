@@ -35,7 +35,6 @@ export default function Header() {
             <Settings aria-hidden="true" />
           </Link>
         </Button>
-        
       </div>
     </header>
   )

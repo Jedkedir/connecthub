@@ -10,11 +10,11 @@ export default function Following({ userId }) {
   const [following, setFollowing] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchFollowing = async () => {
       try {
         setIsLoading(true)
-        const {data} = await getFollowing(userId)
+        const { data } = await getFollowing(userId)
         setFollowing(data.following || [])
       } catch (error) {
         console.error("Error fetching following:", error)
@@ -47,12 +47,12 @@ export default function Following({ userId }) {
       </Card>
     )
   }
- return (
+  return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {following.map((followedUser) => (
-        <Follow 
-          key={followedUser._id} 
-          user={followedUser} 
+        <Follow
+          key={followedUser._id}
+          user={followedUser}
           currentUser={currentUser}
           showActions={currentUser._id === userId}
         />

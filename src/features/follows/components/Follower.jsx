@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { useFollows } from "../hooks/useFollows"
-import Follow,{FollowSkeleton} from "./Follow"
-import {useAuthStore} from "@/features/auth"
-
+import Follow, { FollowSkeleton } from "./Follow"
+import { useAuthStore } from "@/features/auth"
 
 export default function Follower({ userId }) {
   const { getFollowers } = useFollows()
@@ -15,7 +14,7 @@ export default function Follower({ userId }) {
     const fetchFollowers = async () => {
       try {
         setIsLoading(true)
-        const {data} = await getFollowers(userId)
+        const { data } = await getFollowers(userId)
         setFollowers(data.followers || [])
       } catch (error) {
         console.error("Error fetching followers:", error)
@@ -52,11 +51,11 @@ export default function Follower({ userId }) {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {followers.map((follower) => (
-        <Follow 
-          key={follower._id} 
-          user={follower} 
+        <Follow
+          key={follower._id}
+          user={follower}
           currentUser={currentUser}
-          showActions={currentUser._id === userId} 
+          showActions={currentUser._id === userId}
         />
       ))}
     </div>

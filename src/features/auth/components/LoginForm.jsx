@@ -1,14 +1,13 @@
 import { useState } from "react"
 import { FaApple, FaGoogle, FaMicrosoft } from "react-icons/fa"
-import { EyeOffIcon,EyeIcon } from "lucide-react"
+import { EyeOffIcon, EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Field, FieldLabel, FieldGroup } from "@/components/ui/field"
 import {
-  Field,
-  FieldLabel,
-  FieldGroup,
-} from "@/components/ui/field"
-import {InputGroup,
-  InputGroupInput,InputGroupButton} from "@/components/ui/input-group"
+  InputGroup,
+  InputGroupInput,
+  InputGroupButton,
+} from "@/components/ui/input-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,38 +41,45 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
   return (
     <form className="mt-4 flex flex-col gap-6" onSubmit={handleSubmit}>
       <Field className="flex flex-col gap-2">
-        <FieldLabel htmlFor="login-identifier" className="text-muted-foreground">
+        <FieldLabel
+          htmlFor="login-identifier"
+          className="text-muted-foreground"
+        >
           Email
         </FieldLabel>
         <InputGroup>
-        <InputGroupInput
-          autoComplete="username"
-          id="login-identifier"
-          onChange={(event) => setIdentifier(event.target.value)}
-          placeholder="name@connecthub.com"
-          required
-          type="text"
-          value={identifier}
-        />
+          <InputGroupInput
+            autoComplete="username"
+            id="login-identifier"
+            onChange={(event) => setIdentifier(event.target.value)}
+            placeholder="name@connecthub.com"
+            required
+            type="text"
+            value={identifier}
+          />
         </InputGroup>
       </Field>
       <Field className="flex flex-col gap-2">
         <FieldLabel htmlFor="login-password" className="text-muted-foreground">
           Password
-        </FieldLabel> 
+        </FieldLabel>
         <InputGroup>
-        <InputGroupInput
-          id="login-password"
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          type={showPassword ? "text" : "password"}
-          value={password}
-          placeholder="Enter password"
-        />
-        <InputGroupButton align="inline-end" onClick={togglePasswordVisibility} className="cursor-pointer">
-          {showPassword ? <EyeIcon /> : <EyeOffIcon />}
-        </InputGroupButton>
-      </InputGroup>
+          <InputGroupInput
+            id="login-password"
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type={showPassword ? "text" : "password"}
+            value={password}
+            placeholder="Enter password"
+          />
+          <InputGroupButton
+            align="inline-end"
+            onClick={togglePasswordVisibility}
+            className="cursor-pointer"
+          >
+            {showPassword ? <EyeIcon /> : <EyeOffIcon />}
+          </InputGroupButton>
+        </InputGroup>
       </Field>
 
       <div className="flex flex-row items-center justify-between gap-6">
@@ -87,9 +93,9 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
             Remember me
           </Label>
         </div>
-          <Button type="button" variant="link" className="h-auto p-0">
+        <Button type="button" variant="link" className="h-auto p-0">
           Forgot Password?
-          </Button>
+        </Button>
       </div>
 
       {error ? (
