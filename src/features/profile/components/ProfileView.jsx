@@ -51,7 +51,7 @@ export default function ProfileView({ userId }) {
     if (!id) return null
     if (authenticatedUserProfile) {
       // if current user, prefer currentUser from store
-      if (currentUser) return { user: currentUser, isFollowing: false }
+      //if (currentUser) return { user: currentUser, isFollowing: false }
       const response = await getCurrentUser()
       return response
     }
@@ -130,6 +130,7 @@ export default function ProfileView({ userId }) {
           isFollowed = response.isFollowing || false
         }
 
+        console.log("Response", response)
         if (userData) {
           setProfile(userData)
           setIsFollowing(userData.isFollowing || isFollowed)
@@ -184,6 +185,7 @@ export default function ProfileView({ userId }) {
       </Card>
     )
   }
+  console.log("Profile data loaded:", profile) // Debug log
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Card className="overflow-hidden">

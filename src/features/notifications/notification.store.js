@@ -14,7 +14,9 @@ export const useNotificationStore = create((set, get) => ({
   addNotification: (notification) => {
     set((state) => ({
       notifications: [notification, ...state.notifications],
-      unreadCount: !notification.isRead ? state.unreadCount + 1 : state.unreadCount,
+      unreadCount: !notification.isRead
+        ? state.unreadCount + 1
+        : state.unreadCount,
     }))
   },
 
@@ -39,11 +41,17 @@ export const useNotificationStore = create((set, get) => ({
 
   removeNotification: (notificationId) => {
     set((state) => {
-      const notification = state.notifications.find((n) => n._id === notificationId)
-      const notifications = state.notifications.filter((n) => n._id !== notificationId)
+      const notification = state.notifications.find(
+        (n) => n._id === notificationId
+      )
+      const notifications = state.notifications.filter(
+        (n) => n._id !== notificationId
+      )
       return {
         notifications,
-        unreadCount: !notification?.isRead ? Math.max(0, state.unreadCount - 1) : state.unreadCount,
+        unreadCount: !notification?.isRead
+          ? Math.max(0, state.unreadCount - 1)
+          : state.unreadCount,
       }
     })
   },

@@ -68,7 +68,7 @@ export function ThemeProvider({
   ...props
 }) {
   const [theme, setThemeState] = React.useState(() => {
-    const storedTheme = localStorage.getItem(storageKey)
+    const storedTheme = sessionStorage.getItem(storageKey)
     if (isTheme(storedTheme)) {
       return storedTheme
     }
@@ -78,7 +78,7 @@ export function ThemeProvider({
 
   const setTheme = React.useCallback(
     (nextTheme) => {
-      localStorage.setItem(storageKey, nextTheme)
+      sessionStorage.setItem(storageKey, nextTheme)
       setThemeState(nextTheme)
     },
     [storageKey]
@@ -150,7 +150,7 @@ export function ThemeProvider({
                 ? "light"
                 : "dark"
 
-        localStorage.setItem(storageKey, nextTheme)
+        sessionStorage.setItem(storageKey, nextTheme)
         return nextTheme
       })
     }
@@ -164,7 +164,7 @@ export function ThemeProvider({
 
   React.useEffect(() => {
     const handleStorageChange = (event) => {
-      if (event.storageArea !== localStorage) {
+      if (event.storageArea !== sessionStorage) {
         return
       }
 

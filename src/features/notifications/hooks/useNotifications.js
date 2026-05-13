@@ -19,27 +19,31 @@ export function useNotifications() {
   const unreadCount = useNotificationStore((state) => state.unreadCount)
   const addNotification = useNotificationStore((state) => state.addNotification)
   const markAsReadStore = useNotificationStore((state) => state.markAsRead)
-  const markAllAsReadStore = useNotificationStore((state) => state.markAllAsRead)
+  const markAllAsReadStore = useNotificationStore(
+    (state) => state.markAllAsRead
+  )
   const removeNotification = useNotificationStore(
     (state) => state.removeNotification
   )
   const clearAllNotifications = useNotificationStore(
     (state) => state.clearAllNotifications
   )
-  const setNotifications = useNotificationStore((state) => state.setNotifications)
+  const setNotifications = useNotificationStore(
+    (state) => state.setNotifications
+  )
   const user = useAuthStore((state) => state.user)
 
   const getNotifications = getNotificationsAction.execute
   const markAsRead = markAsReadAction.execute
   const markAllAsRead = markAllAsReadAction.execute
   const deleteNotification = deleteNotificationAction.execute
+
   // Load notifications on mount
   useEffect(() => {
     if (!user?._id) return
 
     getNotifications()
-      .then(({data}) => {
-        console.log("Fetched notifications:", data)
+      .then(({ data }) => {
         if (data) {
           setNotifications(data)
         }
@@ -51,8 +55,7 @@ export function useNotifications() {
 
   // Listen for real-time notifications via socket
   useEffect(() => {
-    const socket = getSocket(user?._id)
-    console.log("Setting up notification socket listener:", socket) // Debug log
+    const socket = getSocket()
     if (!socket) return
 
     const handleNotification = (notification) => {
@@ -66,14 +69,17 @@ export function useNotifications() {
     }
   }, [addNotification])
 
-  const handleMarkAsRead = useCallback(async (id) => {
-    markAsReadStore(id)
-    try {
-      await markAsRead(id)
-    } catch (error) {
-      console.error("Error marking notification as read:", error)
-    }
-  }, [markAsReadStore, markAsRead])
+  const handleMarkAsRead = useCallback(
+    async (id) => {
+      markAsReadStore(id)
+      try {
+        await markAsRead(id)
+      } catch (error) {
+        console.error("Error marking notification as read:", error)
+      }
+    },
+    [markAsReadStore, markAsRead]
+  )
 
   const handleMarkAllAsRead = useCallback(async () => {
     markAllAsReadStore()
@@ -84,14 +90,17 @@ export function useNotifications() {
     }
   }, [markAllAsReadStore, markAllAsRead])
 
-  const handleDeleteNotification = useCallback(async (id) => {
-    removeNotification(id)
-    try {
-      await deleteNotification(id)
-    } catch (error) {
-      console.error("Error deleting notification:", error)
-    }
-  }, [removeNotification, deleteNotification])
+  const handleDeleteNotification = useCallback(
+    async (id) => {
+      removeNotification(id)
+      try {
+        await deleteNotification(id)
+      } catch (error) {
+        console.error("Error deleting notification:", error)
+      }
+    },
+    [removeNotification, deleteNotification]
+  )
 
   return useMemo(
     () => ({

@@ -47,7 +47,7 @@ export default function Follower({ userId }) {
       </Card>
     )
   }
-
+  console.log("Followers loaded:", followers) // Debug log
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {followers.map((follower) => (

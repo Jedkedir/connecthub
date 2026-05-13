@@ -61,7 +61,7 @@ export const authService = {
   login(payload) {
     return authRequest(() => api.post(endpoints.auth.login, payload))
   },
-  refresh(refreshToken = localStorage.getItem("refreshToken")) {
+  refresh(refreshToken = sessionStorage.getItem("refreshToken")) {
     return authRequest(() => api.post(endpoints.auth.refresh, { refreshToken }))
   },
   register(payload) {

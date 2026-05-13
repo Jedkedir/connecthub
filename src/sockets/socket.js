@@ -1,5 +1,5 @@
-import { io } from 'socket.io-client'
-import { API_ORIGIN } from '@/services/apiClient'
+import { io } from "socket.io-client"
+import { API_ORIGIN } from "@/services/apiClient"
 
 let socket = null
 
@@ -15,24 +15,22 @@ export function initSocket(userId) {
       userId: userId.toString(),
     },
   })
-  socket.on('connect', () => {
-    console.log('Socket connected', socket.id)
+  socket.on("connect", () => {
+    console.log("Socket connected", socket.id)
   })
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected')
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected")
   })
 
-  socket.on('error', (error) => {
-    console.error('Socket error:', error)
+  socket.on("error", (error) => {
+    console.error("Socket error:", error)
   })
 
   return socket
 }
 
-export function getSocket(userId) {
-  initSocket(userId) // Ensure socket is initialized before returning
-  console.log('Getting socket instance:', socket) // Debug log
+export function getSocket() {
   return socket
 }
 

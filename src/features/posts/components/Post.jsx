@@ -2,21 +2,13 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import {
-  Heart,
-  MessageCircle,
-  Bookmark,
-  Share2,
-  Eye,
-
-} from "lucide-react"
+import { Heart, MessageCircle, Bookmark, Share2, Eye } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { Link } from "react-router-dom"
 export default function Post({ post }) {
- 
   const [isLiked, setIsLiked] = useState(post.isLiked || false)
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false)
   const [likesCount, setLikesCount] = useState(post.likesCount)

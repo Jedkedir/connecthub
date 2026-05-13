@@ -47,6 +47,7 @@ export default function Following({ userId }) {
       </Card>
     )
   }
+  console.log("Following loaded:", following) // Debug log
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {following.map((followedUser) => (

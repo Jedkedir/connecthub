@@ -1,7 +1,7 @@
 import { create } from "zustand"
 
-const storedUser = localStorage.getItem("user")
-const storedAccessToken = localStorage.getItem("accessToken")
+const storedUser = sessionStorage.getItem("user")
+const storedAccessToken = sessionStorage.getItem("accessToken")
 
 export const useProfileStore = create((set) => ({
   user: storedUser ? JSON.parse(storedUser) : null,
