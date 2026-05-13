@@ -32,17 +32,24 @@ function extractAuthData(payload) {
 function persistAuthTokens(payload) {
   const { accessToken, refreshToken, user } = extractAuthData(payload)
 
-  if (accessToken || refreshToken || user) {
-    useAuthStore.getState().login({
-      user: user || null,
-      accessToken: accessToken || null,
-      refreshToken: refreshToken || null,
-    })
+  if (!accessToken && !refreshToken && !user) {
+    return
+  }
 
-    // Initialize socket connection when user logs in
-    if (user?._id) {
-      initSocket(user._id)
-    }
+  const currentState = useAuthStore.getState()
+  const nextUser = user || currentState.user
+  const nextAccessToken = accessToken || currentState.accessToken
+  const nextRefreshToken = refreshToken || currentState.refreshToken
+
+  useAuthStore.getState().login({
+    user: nextUser,
+    accessToken: nextAccessToken,
+    refreshToken: nextRefreshToken,
+  })
+
+  // Initialize socket connection when a user payload is present
+  if (nextUser?._id || nextUser?.id) {
+    initSocket(nextUser._id || nextUser.id)
   }
 }
 

@@ -1,4 +1,5 @@
 export { default as ProfileView } from "./components/ProfileView"
+export { useEditProfile } from "./hooks/useEditProfile"
 export { useProfile } from "./hooks/useProfile"
 export { useProfileTabs } from "./hooks/useProfileTabs"
 export { profileService } from "./services/profile.service"

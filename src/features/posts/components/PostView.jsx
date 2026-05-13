@@ -86,7 +86,7 @@ function Comment({
         <div className="rounded-lg bg-muted p-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold">
-              @{comment.userId?.username || "user"}
+              {comment.userId?.username || "user"}
             </p>
             <div className="flex items-center gap-2">
               <p className="text-xs text-muted-foreground">{timeAgo}</p>
@@ -577,7 +577,7 @@ export default function PostView({ postId }) {
               </Link>
               <div>
                 <p className="text-sm font-semibold">
-                  @{post.authorId?.username}
+                 {post.authorId?.username}
                 </p>
                 <p className="text-xs text-muted-foreground">{timeAgo}</p>
               </div>

@@ -80,7 +80,7 @@ export default function Post({ post }) {
             </Link>
             <div>
               <p className="text-sm font-semibold">
-                @{post?.authorId?.username}
+                {post?.authorId?.username}
               </p>
               <p className="text-xs text-muted-foreground">{timeAgo}</p>
             </div>

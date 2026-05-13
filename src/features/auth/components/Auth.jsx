@@ -16,12 +16,13 @@ export default function Auth() {
   const { login, loginState, register, registerState } = useAuth()
 
   const loginError =
-    loginState.error?.response?.data?.message ?? loginState.error?.message ?? ""
+    loginState.error?.response?.data?.error?.message ?? loginState.error?.message ?? ""
   const registerError =
-    registerState.error?.response?.data?.message ??
+    registerState.error?.response?.data?.error?.message ??
     registerState.error?.message ??
     ""
-
+  console.log(loginState)
+  console.log(registerState)
   const handleLogin = async (payload) => {
     setNotice("")
     await login(payload)

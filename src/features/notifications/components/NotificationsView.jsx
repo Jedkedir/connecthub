@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { Archive, CheckCheck } from "lucide-react"
+import { CheckCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -32,7 +32,6 @@ export default function NotificationsView() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    clearAllNotifications,
   } = useNotifications()
 
   const { acceptFollowRequest, rejectFollowRequest } = useFollows()
@@ -87,15 +86,6 @@ export default function NotificationsView() {
     markAllAsRead()
   }
 
-  const handleClearAll = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear all notifications? This action cannot be undone."
-      )
-    ) {
-      clearAllNotifications()
-    }
-  }
 
   if (isLoading && notifications.length === 0) {
     return (
