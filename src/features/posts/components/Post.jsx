@@ -16,6 +16,7 @@ import { formatDistanceToNow } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { Link } from "react-router-dom"
 export default function Post({ post }) {
+ 
   const [isLiked, setIsLiked] = useState(post.isLiked || false)
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false)
   const [likesCount, setLikesCount] = useState(post.likesCount)

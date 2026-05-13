@@ -1,4 +1,5 @@
 export { Avatar, AvatarFallback, AvatarImage } from "./avatar"
+export { Badge } from "./badge"
 export { Button, buttonVariants } from "./button"
 export {
   Card,

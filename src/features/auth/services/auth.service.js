@@ -1,6 +1,7 @@
 import api from "@/services/apiClient"
 import { endpoints } from "@/services/endpoints"
 import { useAuthStore } from "../auth.store"
+import { initSocket } from "@/sockets/socket"
 
 const avatarUrl = (seed) => {
   const randomVariant = (size) => Math.floor(Math.random() * size) + 1
@@ -37,6 +38,11 @@ function persistAuthTokens(payload) {
       accessToken: accessToken || null,
       refreshToken: refreshToken || null,
     })
+
+    // Initialize socket connection when user logs in
+    if (user?._id) {
+      initSocket(user._id)
+    }
   }
 }
 

@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { disconnectSocket, initSocket } from "@/sockets/socket"
 
 const storedUser = localStorage.getItem("user")
 const storedAccessToken = localStorage.getItem("accessToken")
@@ -14,6 +15,11 @@ export const useAuthStore = create((set) => ({
     localStorage.setItem("accessToken", accessToken)
     localStorage.setItem("refreshToken", refreshToken)
 
+    // Initialize socket connection
+    if (user?.id) {
+      initSocket(user.id)
+    }
+
     set({
       user,
       accessToken,
@@ -23,6 +29,7 @@ export const useAuthStore = create((set) => ({
 
   logout: () => {
     localStorage.clear()
+    disconnectSocket()
 
     set({
       user: null,
@@ -39,3 +46,12 @@ export const useAuthStore = create((set) => ({
     })
   },
 }))
+
+// Initialize socket on app load if user is already logged in
+const storedUserFromInit = localStorage.getItem("user")
+if (storedUserFromInit) {
+  const user = JSON.parse(storedUserFromInit)
+  if (user?.id) {
+    initSocket(user.id)
+  }
+}

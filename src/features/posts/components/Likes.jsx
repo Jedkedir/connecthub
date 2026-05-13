@@ -11,7 +11,7 @@ export default function Likes() {
     const fetchLikedPosts = async () => {
       try {
         const response = await getLikedPosts()
-
+        console.log("Fetched liked posts:", response)
         setLikedPosts(response.data || [])
       } catch (error) {
         console.error("Error fetching liked posts:", error)

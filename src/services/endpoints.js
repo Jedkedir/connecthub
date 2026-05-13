@@ -23,6 +23,8 @@ export const endpoints = {
     list: "/notifications",
     markAllRead: "/notifications/read-all",
     markRead: (id) => `/notifications/${id}/read`,
+    delete: (id) => `/notifications/${id}`,
+    deleteAll: "/notifications",
   },
   posts: {
     bookmarks: "/posts/bookmarks/me",
