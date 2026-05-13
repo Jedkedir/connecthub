@@ -28,15 +28,20 @@ export default function NotFound() {
             <h1 className="text-6xl font-bold text-primary">404</h1>
             <h2 className="text-2xl font-semibold">Page Not Found</h2>
             <p className="text-muted-foreground">
-              Sorry, the page you&apos;re looking for doesn&apos;t exist or has been moved.
+              Sorry, the page you&apos;re looking for doesn&apos;t exist or has
+              been moved.
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex w-full flex-col gap-2">
             <Button onClick={() => navigate("/")} className="w-full">
               Go to Home
             </Button>
-            <Button onClick={() => navigate(-1)} variant="outline" className="w-full">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="outline"
+              className="w-full"
+            >
               Go Back
             </Button>
           </div>

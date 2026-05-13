@@ -1,15 +1,19 @@
 import { useMemo } from "react"
-import { LogOut, MonitorCog, Moon, Palette,  Sun } from "lucide-react"
+import { LogOut, MonitorCog, Moon, Palette, Sun } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import EditProfile from "@/features/profile/components/EditProfile"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { useTheme } from "@/shared/components"
-
-
 
 export default function Setting() {
   const navigate = useNavigate()
@@ -29,8 +33,6 @@ export default function Setting() {
 
     return "System"
   }, [theme])
-
-  
 
   const handleLogout = () => {
     logout()
@@ -91,7 +93,6 @@ export default function Setting() {
         </CardContent>
       </Card>
 
-      
       <Card>
         <CardHeader>
           <CardTitle>Account</CardTitle>

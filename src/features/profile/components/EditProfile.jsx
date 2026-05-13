@@ -3,10 +3,25 @@ import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
-import { InputGroup, InputGroupInput, InputGroupButton } from "@/components/ui/input-group"
+import {
+  InputGroup,
+  InputGroupInput,
+  InputGroupButton,
+} from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/features/auth/hooks/useAuth"
@@ -46,15 +61,16 @@ function generateAvatarUrl(seed) {
 }
 
 export default function EditProfile() {
-  const { user, changePassword, changePasswordState, updateUser } =
-    useAuth()
-  
+  const { user, changePassword, changePasswordState, updateUser } = useAuth()
+
   const { updateProfile, updateProfileState } = useProfile()
 
   // Form state
   const [fullName, setFullName] = useState(user?.username || "")
   const [bio, setBio] = useState(user?.bio || "")
-  const [selectedAvatarSeed, setSelectedAvatarSeed] = useState(user?.username || "Alice")
+  const [selectedAvatarSeed, setSelectedAvatarSeed] = useState(
+    user?.username || "Alice"
+  )
   const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
   // Password state
@@ -66,7 +82,10 @@ export default function EditProfile() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [passwordError, setPasswordError] = useState("")
 
-  const avatarUrl = useMemo(() => generateAvatarUrl(selectedAvatarSeed), [selectedAvatarSeed])
+  const avatarUrl = useMemo(
+    () => generateAvatarUrl(selectedAvatarSeed),
+    [selectedAvatarSeed]
+  )
 
   const profileChanged = useMemo(() => {
     return (
@@ -127,12 +146,16 @@ export default function EditProfile() {
       setConfirmPassword("")
       setShowPasswordForm(false)
     } catch (error) {
-      const message = error?.response?.data?.message || error?.message || "Failed to change password"
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to change password"
       setPasswordError(message)
     }
   }, [passwordValid, newPassword, currentPassword, changePassword])
 
-  const isLoading = updateProfileState.isLoading || changePasswordState.isLoading
+  const isLoading =
+    updateProfileState.isLoading || changePasswordState.isLoading
 
   return (
     <div className="space-y-6">
@@ -140,12 +163,16 @@ export default function EditProfile() {
       <Card>
         <CardHeader>
           <CardTitle>Profile Picture</CardTitle>
-          <CardDescription>Choose from our collection of avatars</CardDescription>
+          <CardDescription>
+            Choose from our collection of avatars
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-6 sm:flex-row">
           <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
             <AvatarImage src={avatarUrl} alt={fullName} />
-            <AvatarFallback>{fullName.slice(0, 2).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>
+              {fullName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
 
           <Button
@@ -174,7 +201,8 @@ export default function EditProfile() {
                 }}
                 className={cn(
                   "flex flex-col items-center gap-2 rounded-lg p-2 transition-colors hover:bg-accent",
-                  selectedAvatarSeed === seed && "border-2 border-primary bg-primary/5"
+                  selectedAvatarSeed === seed &&
+                    "border-2 border-primary bg-primary/5"
                 )}
               >
                 <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
@@ -272,7 +300,10 @@ export default function EditProfile() {
           ) : (
             <div className="space-y-4">
               <Field>
-                <FieldLabel htmlFor="current-password" className="text-muted-foreground">
+                <FieldLabel
+                  htmlFor="current-password"
+                  className="text-muted-foreground"
+                >
                   Current Password
                 </FieldLabel>
                 <InputGroup>
@@ -293,7 +324,10 @@ export default function EditProfile() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="new-password" className="text-muted-foreground">
+                <FieldLabel
+                  htmlFor="new-password"
+                  className="text-muted-foreground"
+                >
                   New Password
                 </FieldLabel>
                 <InputGroup>
@@ -314,7 +348,10 @@ export default function EditProfile() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="confirm-password" className="text-muted-foreground">
+                <FieldLabel
+                  htmlFor="confirm-password"
+                  className="text-muted-foreground"
+                >
                   Confirm Password
                 </FieldLabel>
                 <InputGroup>

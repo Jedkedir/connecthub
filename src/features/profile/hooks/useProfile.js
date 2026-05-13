@@ -55,7 +55,8 @@ export function useProfile() {
       }
 
       const authenticatedUser = useAuthStore.getState().user
-      const authenticatedUserId = authenticatedUser?._id || authenticatedUser?.id
+      const authenticatedUserId =
+        authenticatedUser?._id || authenticatedUser?.id
       const responseUserId = user?._id || user?.id
       const userChanged = hasUserChanged(authenticatedUser, user)
 

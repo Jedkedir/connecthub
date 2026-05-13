@@ -86,7 +86,6 @@ export default function NotificationsView() {
     markAllAsRead()
   }
 
-
   if (isLoading && notifications.length === 0) {
     return (
       <Card>

@@ -8,7 +8,7 @@ import Bookmarks from "@/pages/Bookmarks"
 import Explore from "@/pages/Explore"
 import Home from "@/pages/Home"
 import Login from "@/pages/Login"
-import Messages from "@/pages/Messages" // TODO: on later version, this page is not ready yet 
+import Messages from "@/pages/Messages" // TODO: on later version, this page is not ready yet
 import Notifications from "@/pages/Notifications"
 import Profile from "@/pages/Profile"
 import PostDetail from "@/pages/PostDetail"
