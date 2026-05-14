@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { debounce } from "@/lib/utils";
-import PostCard from "./PostCard";
+// import PostCard from "./PostCard";
+import Post from "../../posts/components/Post";
 
 export default function ExploreView() {
   const [posts, setPosts] = useState([]);
@@ -15,7 +16,7 @@ export default function ExploreView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const observerRef = useRef();
-  const loadingRef = useRef(false); // to avoid stale closure in fetchPosts
+  const loadingRef = useRef(false); 
 
   const fetchPosts = useCallback(async (reset, query, cursorParam) => {
     if (loadingRef.current) return;
@@ -82,7 +83,7 @@ export default function ExploreView() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm pb-4">
         <Input
           type="text"
@@ -106,7 +107,8 @@ export default function ExploreView() {
         <ScrollArea className="h-[calc(100vh-10rem)]">
           {posts.map((post, idx) => (
             <div key={post._id} ref={idx === posts.length - 1 ? lastPostRef : null}>
-              <PostCard post={post} />
+              {/* <PostCard post={post} /> */}
+              <Post post={post} />
             </div>
           ))}
           {loading && <div className="text-center py-4 text-muted-foreground">Loading more...</div>}
