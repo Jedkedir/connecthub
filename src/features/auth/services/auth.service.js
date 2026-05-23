@@ -1,4 +1,4 @@
-import api from "@/services/apiClient"
+import api, { authApi } from "@/services/apiClient"
 import { endpoints } from "@/services/endpoints"
 import { useAuthStore } from "../auth.store"
 import { initSocket } from "@/sockets/socket"
@@ -69,7 +69,9 @@ export const authService = {
     return authRequest(() => api.post(endpoints.auth.login, payload))
   },
   refresh(refreshToken = sessionStorage.getItem("refreshToken")) {
-    return authRequest(() => api.post(endpoints.auth.refresh, { refreshToken }))
+    return authRequest(() =>
+      authApi.post(endpoints.auth.refresh, { refreshToken })
+    )
   },
   register(payload) {
     // Generate a unique avatar URL based on the username

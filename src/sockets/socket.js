@@ -1,5 +1,6 @@
 import { io } from "socket.io-client"
-import { API_ORIGIN } from "@/services/apiClient"
+
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? "http://localhost:5000"
 
 let socket = null
 
