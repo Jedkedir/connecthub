@@ -130,7 +130,6 @@ export default function ProfileView({ userId }) {
           isFollowed = response.isFollowing || false
         }
 
-        console.log("Response", response)
         if (userData) {
           setProfile(userData)
           setIsFollowing(userData.isFollowing || isFollowed)
@@ -185,7 +184,6 @@ export default function ProfileView({ userId }) {
       </Card>
     )
   }
-  console.log("Profile data loaded:", profile) // Debug log
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Card className="overflow-hidden">

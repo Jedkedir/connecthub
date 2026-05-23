@@ -23,8 +23,7 @@ export default function Auth() {
     registerState.error?.response?.data?.error?.message ??
     registerState.error?.message ??
     ""
-  console.log(loginState)
-  console.log(registerState)
+  
   const handleLogin = async (payload) => {
     setNotice("")
     await login(payload)
