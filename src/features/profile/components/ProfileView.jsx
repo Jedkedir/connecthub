@@ -91,8 +91,8 @@ export default function ProfileView({ userId }) {
     // Implement share functionality
     if (navigator.share) {
       navigator.share({
-        title: profile?.username,
-        text: `Check out ${profile?.username}'s profile`,
+        title: profile?.fullname,
+        text: `Check out ${profile?.fullname}'s profile`,
         url: window.location.href,
       })
     }
@@ -200,11 +200,11 @@ export default function ProfileView({ userId }) {
                   profile?.profilePic ??
                   "https://api.dicebear.com/9.x/adventurer-neutral/svg"
                 }
-                alt={profile?.username ?? "User"}
+                alt={profile?.fullname ?? "User"}
               />
               <AvatarFallback className="bg-primary/10 text-sm text-primary sm:text-base">
-                {profile?.username
-                  ? profile.username.charAt(0).toUpperCase()
+                {profile?.fullname
+                  ? profile.fullname.charAt(0).toUpperCase()
                   : "U"}
               </AvatarFallback>
             </Avatar>
@@ -253,10 +253,10 @@ export default function ProfileView({ userId }) {
       <section className="flex flex-col items-start gap-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-semibold tracking-normal text-foreground">
-            {profile?.username ?? "User Name"}
+            {profile?.fullname ?? "User Name"}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {profile?.email ?? ""}
+            @{profile?.username ?? ""}
           </p>
         </div>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground md:text-base">

@@ -31,8 +31,8 @@ const NOTIFICATION_TYPE_ICONS = {
   MENTION: "@",
 }
 
-function getUsername(notification) {
-  return notification?.senderId?.username || "Unknown user"
+function getfullname(notification) {
+  return notification?.senderId?.fullname || "Unknown user"
 }
 
 function getAvatar(notification) {
@@ -67,7 +67,7 @@ export default function MessagesView({
 
   const isFollowRequest = notification.type === "FOLLOW_REQUEST"
   const senderId = notification?.senderId?._id
-  const username = getUsername(notification)
+  const fullname = getfullname(notification)
   const avatarSrc = getAvatar(notification)
   const postPreview = getPostPreview(notification)
   const timestamp = notification?.createdAt
@@ -86,9 +86,9 @@ export default function MessagesView({
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-start gap-3 sm:gap-4">
           <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
-            <AvatarImage src={avatarSrc} alt={username} />
+            <AvatarImage src={avatarSrc} alt={fullname} />
             <AvatarFallback>
-              {username.slice(0, 2).toUpperCase()}
+              {fullname.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 
@@ -96,7 +96,7 @@ export default function MessagesView({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground">
-                  <span className="mr-1">{username}</span>
+                  <span className="mr-1">{fullname}</span>
                   <span className="font-normal text-muted-foreground">
                     {notification.message}
                   </span>

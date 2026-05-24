@@ -78,7 +78,7 @@ function Comment({
             }
           />
           <AvatarFallback>
-            {comment.userId?.username?.slice(0, 2).toUpperCase() || "User"}
+            {comment.userId?.fullname?.slice(0, 2).toUpperCase() || "User"}
           </AvatarFallback>
         </Avatar>
       </Link>
@@ -86,7 +86,7 @@ function Comment({
         <div className="rounded-lg bg-muted p-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold">
-              {comment.userId?.username || "user"}
+              {comment.userId?.fullname || "user"}
             </p>
             <div className="flex items-center gap-2">
               <p className="text-xs text-muted-foreground">{timeAgo}</p>
@@ -517,8 +517,8 @@ export default function PostView({ postId }) {
     await fetchComments(postId, false)
   }
 
-  const getInitials = (username) => {
-    return username?.slice(0, 2).toUpperCase() || "U"
+  const getInitials = (fullname) => {
+    return fullname?.slice(0, 2).toUpperCase() || "U"
   }
 
   const postDate = post?.createdAt ? new Date(post.createdAt) : null
@@ -571,13 +571,13 @@ export default function PostView({ postId }) {
                     }
                   />
                   <AvatarFallback>
-                    {getInitials(post.authorId?.username)}
+                    {getInitials(post.authorId?.fullname)}
                   </AvatarFallback>
                 </Avatar>
               </Link>
               <div>
                 <p className="text-sm font-semibold">
-                  {post.authorId?.username}
+                  {post.authorId?.fullname}
                 </p>
                 <p className="text-xs text-muted-foreground">{timeAgo}</p>
               </div>

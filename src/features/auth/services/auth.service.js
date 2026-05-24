@@ -19,8 +19,8 @@ const avatarUrl = (seed) => {
   return url.href
 }
 
-function createAvatarUrl(username) {
-  const avatar = avatarUrl(username)
+function createAvatarUrl(fullname) {
+  const avatar = avatarUrl(fullname)
   return avatar
 }
 
@@ -74,8 +74,8 @@ export const authService = {
     )
   },
   register(payload) {
-    // Generate a unique avatar URL based on the username
-    const avatarUrl = createAvatarUrl(payload.username)
+    // Generate a unique avatar URL based on the fullname
+    const avatarUrl = createAvatarUrl(payload.fullname)
     payload.profilePic = avatarUrl
     return authRequest(() => api.post(endpoints.auth.register, payload))
   },

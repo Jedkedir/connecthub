@@ -66,10 +66,10 @@ export default function EditProfile() {
   const { updateProfile, updateProfileState } = useProfile()
 
   // Form state
-  const [fullName, setFullName] = useState(user?.username || "")
+  const [fullName, setFullName] = useState(user?.fullname || "")
   const [bio, setBio] = useState(user?.bio || "")
   const [selectedAvatarSeed, setSelectedAvatarSeed] = useState(
-    user?.username || "Alice"
+    user?.fullname || "Alice"
   )
   const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
@@ -89,9 +89,9 @@ export default function EditProfile() {
 
   const profileChanged = useMemo(() => {
     return (
-      fullName !== (user?.username || "") ||
+      fullName !== (user?.fullname || "") ||
       bio !== (user?.bio || "") ||
-      selectedAvatarSeed !== (user?.username || "Alice")
+      selectedAvatarSeed !== (user?.fullname || "Alice")
     )
   }, [fullName, bio, selectedAvatarSeed, user])
 
@@ -107,7 +107,7 @@ export default function EditProfile() {
 
     try {
       const result = await updateProfile({
-        username: fullName,
+        fullname: fullName,
         bio,
         profilePic: avatarUrl,
       })

@@ -40,8 +40,8 @@ export default function Follow({ user, currentUser, showActions = true }) {
     }
   }
 
-  const getInitials = (username) => {
-    return username?.slice(0, 2).toUpperCase() || "??"
+  const getInitials = (fullname) => {
+    return fullname?.slice(0, 2).toUpperCase() || "??"
   }
 
   // Determine button text and action based on state
@@ -109,22 +109,22 @@ export default function Follow({ user, currentUser, showActions = true }) {
                     userData.profilePic ||
                     "https://api.dicebear.com/9.x/adventurer-neutral/svg"
                   }
-                  alt={userData.username}
+                  alt={userData.fullname}
                 />
               ) : null}
               <AvatarFallback className="bg-primary/10 text-sm text-primary sm:text-base">
-                {getInitials(userData.username)}
+                {getInitials(userData.fullname)}
               </AvatarFallback>
             </Avatar>
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                 <h3 className="truncate text-base font-semibold transition-colors group-hover:text-primary sm:text-lg">
-                  {userData.username}
+                  {userData.fullname}
                 </h3>
-                {userData.email && (
+                {userData.username && (
                   <span className="truncate text-xs text-muted-foreground sm:text-sm">
-                    {userData.email}
+                    @{userData.username}
                   </span>
                 )}
               </div>

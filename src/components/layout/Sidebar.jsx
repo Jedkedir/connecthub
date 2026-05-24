@@ -99,22 +99,22 @@ export default function Sidebar() {
               >
                 <Avatar className="size-8">
                   <AvatarImage
-                    alt={user?.username ?? "User"}
+                    alt={user?.fullname ?? "User"}
                     src={
                       user?.profilePic ||
                       "https://api.dicebear.com/9.x/adventurer-neutral/svg"
                     }
                   />
                   <AvatarFallback>
-                    {user?.username?.charAt(0)?.toUpperCase() ?? "U"}
+                    {user?.fullname?.charAt(0)?.toUpperCase() ?? "U"}
                   </AvatarFallback>
                 </Avatar>
                 <span className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
-                    {user?.username ?? "User Name"}
+                    {user?.fullname ?? "User Name"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user?.email ?? ""}
+                    @{user?.username ?? ""}
                   </span>
                 </span>
               </Link>

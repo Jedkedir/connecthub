@@ -51,8 +51,8 @@ export default function Post({ post }) {
     navigate(`/posts/${post._id}`)
   }
 
-  const getInitials = (username) => {
-    return username.slice(0, 2).toUpperCase()
+  const getInitials = (fullname) => {
+    return fullname.slice(0, 2).toUpperCase()
   }
 
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), {
@@ -70,17 +70,17 @@ export default function Post({ post }) {
                 <AvatarImage
                   src={
                     post?.authorId?.profilePic ||
-                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${post?.authorId?.username}`
+                    `https://api.dicebear.com/7.x/avataaars/svg?seed=${post?.authorId?.fullname}`
                   }
                 />
                 <AvatarFallback>
-                  {getInitials(post?.authorId?.username || "User")}
+                  {getInitials(post?.authorId?.fullname || "User")}
                 </AvatarFallback>
               </Avatar>
             </Link>
             <div>
               <p className="text-sm font-semibold">
-                {post?.authorId?.username}
+                {post?.authorId?.fullname}
               </p>
               <p className="text-xs text-muted-foreground">{timeAgo}</p>
             </div>

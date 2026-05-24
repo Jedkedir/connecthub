@@ -24,7 +24,7 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
 
     try {
       await onSubmit({
-        username: fullName
+        fullname: fullName
           .split(" ")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(" "),
