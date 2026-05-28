@@ -8,6 +8,16 @@ export const profileService = {
   getUserById(id) {
     return api.get(endpoints.users.byId(id)).then((response) => response.data)
   },
+  getUserByUsername(username) {
+    return api
+      .get(endpoints.users.byUsername(username))
+      .then((response) => response.data)
+  },
+  searchUsers(query, limit = 5, signal) {
+    return api
+      .get(endpoints.users.search(query), { params: { limit }, signal })
+      .then((response) => response.data)
+  },
   updateProfile(payload) {
     return api
       .put(endpoints.users.update, payload)

@@ -25,6 +25,122 @@ import { usePosts } from "../hooks/usePosts"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "@/features/auth"
 import { Link } from "react-router-dom"
+import { useUserSearch } from "@/features/profile/hooks/useUserSearch"
+import {
+  extractMentionsFromContent,
+  getActiveToken,
+  getMentionLookup,
+  getMentionPayload,
+  getTopicPayload,
+  getUserId,
+  renderInteractiveContent,
+} from "@/features/posts/utils/contentTokens"
+
+function MentionCommentInput({
+  disabled = false,
+  onChange,
+  onSubmit,
+  placeholder,
+  rows = 2,
+  submitLabel = "Send",
+  value,
+}) {
+  const [activeToken, setActiveToken] = useState(null)
+  const [selectedMentionUsers, setSelectedMentionUsers] = useState({})
+  const mentionQuery = activeToken?.type === "mention" ? activeToken.query : ""
+  const { users: mentionSuggestions } = useUserSearch(mentionQuery, 5, {
+    enabled: activeToken?.type === "mention",
+    minLength: 0,
+  })
+
+  const updateActiveToken = (text, caretIndex) => {
+    setActiveToken(getActiveToken(text, caretIndex))
+  }
+
+  const handleSelectMention = (suggestedUser) => {
+    if (!activeToken) return
+
+    const mention = `@${suggestedUser.username}`
+    const nextValue = `${value.slice(0, activeToken.start)}${mention} ${value.slice(activeToken.end)}`
+    const userId = getUserId(suggestedUser)
+
+    setSelectedMentionUsers((prev) => ({
+      ...prev,
+      [mention.toLowerCase()]: {
+        id: userId,
+        username: suggestedUser.username,
+      },
+    }))
+    onChange(nextValue)
+    setActiveToken(null)
+  }
+
+  const handleSubmit = async () => {
+    if (!value.trim()) return
+
+    await onSubmit(value, selectedMentionUsers)
+    setActiveToken(null)
+    setSelectedMentionUsers({})
+  }
+
+  const activeMentions = extractMentionsFromContent(value)
+
+  return (
+    <div className="flex-1 space-y-2">
+      <Textarea
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value)
+          updateActiveToken(e.target.value, e.target.selectionStart)
+        }}
+        onClick={(event) =>
+          updateActiveToken(value, event.currentTarget.selectionStart)
+        }
+        onKeyUp={(event) =>
+          updateActiveToken(value, event.currentTarget.selectionStart)
+        }
+        className="text-sm"
+        rows={rows}
+      />
+      {activeToken?.type === "mention" && mentionSuggestions.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {mentionSuggestions.map((suggestedUser) => (
+            <Button
+              key={getUserId(suggestedUser) || suggestedUser.username}
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleSelectMention(suggestedUser)}
+              className="h-7 rounded-full px-3 text-emerald-600 hover:text-emerald-700"
+            >
+              @{suggestedUser.username}
+            </Button>
+          ))}
+        </div>
+      )}
+      {activeMentions.length > 0 && (
+        <div className="flex flex-wrap gap-2 text-xs">
+          {activeMentions.map((mention) => (
+            <span key={mention} className="text-emerald-600">
+              {mention}
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex justify-end">
+        <Button
+          size="sm"
+          onClick={handleSubmit}
+          disabled={disabled || !value.trim()}
+        >
+          <Send className="mr-1 h-3 w-3" />
+          {submitLabel}
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 function Comment({
   comment,
@@ -42,6 +158,8 @@ function Comment({
   const [isLiked, setIsLiked] = useState(comment?.isLiked || false)
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState("")
+  const navigate = useNavigate()
+  const mentionLookup = getMentionLookup(comment.mentions, comment.mentionedUsers)
 
   let timeAgo = "Just now"
 
@@ -51,9 +169,9 @@ function Comment({
     })
   }
 
-  const handleSubmitReply = () => {
+  const handleSubmitReply = async (content, selectedMentionUsers) => {
     if (replyContent.trim()) {
-      onReply(comment._id, replyContent)
+      await onReply(comment._id, content, selectedMentionUsers)
       setReplyContent("")
       setShowReplyInput(false)
     }
@@ -123,7 +241,13 @@ function Comment({
               rows={2}
             />
           ) : (
-            <p className="mt-1 text-sm">{comment.content}</p>
+            <p className="mt-1 text-sm">
+              {renderInteractiveContent({
+                mentionLookup,
+                navigate,
+                text: comment.content,
+              })}
+            </p>
           )}
         </div>
         {editingId === comment._id && (
@@ -174,16 +298,14 @@ function Comment({
         </div>
         {showReplyInput && (
           <div className="mt-2 flex items-start space-x-2">
-            <Textarea
+            <MentionCommentInput
               placeholder="Write a reply..."
               value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              className="flex-1 text-sm"
+              onChange={setReplyContent}
+              onSubmit={handleSubmitReply}
               rows={2}
+              submitLabel=""
             />
-            <Button size="sm" onClick={handleSubmitReply}>
-              <Send className="h-3 w-3" />
-            </Button>
           </div>
         )}
         {comment.replies && comment.replies.length > 0 && (
@@ -312,12 +434,16 @@ export default function PostView({ postId }) {
     refreshComments()
   }, [isSubmitting, postId, fetchComments])
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return
+  const handleAddComment = async (content = newComment, selectedMentionUsers = {}) => {
+    if (!content.trim()) return
 
     setIsSubmitting(true)
     try {
-      await addComment(postId, { content: newComment })
+      await addComment(postId, {
+        content,
+        ...getMentionPayload(content, selectedMentionUsers),
+        ...getTopicPayload(content),
+      })
       setNewComment("")
       setPost((p) =>
         p ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
@@ -329,11 +455,20 @@ export default function PostView({ postId }) {
     }
   }
 
-  const handleAddReply = async (parentCommentId, content) => {
+  const handleAddReply = async (
+    parentCommentId,
+    content,
+    selectedMentionUsers = {}
+  ) => {
     if (!content.trim()) return
     setIsSubmitting(true)
     try {
-      await addReply(postId, { parentCommentId, content })
+      await addReply(postId, {
+        parentCommentId,
+        content,
+        ...getMentionPayload(content, selectedMentionUsers),
+        ...getTopicPayload(content),
+      })
       // Refresh comments to show the new reply
       await fetchComments(postId, true)
     } catch (err) {
@@ -537,6 +672,7 @@ export default function PostView({ postId }) {
   if (!post) return null
 
   const ownPost = currentUserId === post.authorId?._id
+  const mentionLookup = getMentionLookup(post.mentions, post.mentionedUsers)
 
   return (
     <div className="min-h-screen rounded-t-full bg-background">
@@ -601,7 +737,15 @@ export default function PostView({ postId }) {
           </CardHeader>
           <Separator />
           <CardContent className="space-y-3 px-0">
-            {post.content && <p className="text-sm">{post.content}</p>}
+            {post.content && (
+              <p className="text-sm">
+                {renderInteractiveContent({
+                  mentionLookup,
+                  navigate,
+                  text: post.content,
+                })}
+              </p>
+            )}
 
             {/* Media Grid */}
             {post.mediaUrls && post.mediaUrls.length > 0 && (
@@ -703,25 +847,15 @@ export default function PostView({ postId }) {
             <Avatar className="h-8 w-8">
               <AvatarFallback>ME</AvatarFallback>
             </Avatar>
-            <div className="flex-1">
-              <Textarea
-                placeholder="Write a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="text-sm"
-                rows={3}
-              />
-              <div className="mt-2 flex justify-end">
-                <Button
-                  size="sm"
-                  onClick={handleAddComment}
-                  disabled={isSubmitting || !newComment.trim()}
-                >
-                  <Send className="mr-1 h-3 w-3" />
-                  Post Comment
-                </Button>
-              </div>
-            </div>
+            <MentionCommentInput
+              placeholder="Write a comment..."
+              value={newComment}
+              onChange={setNewComment}
+              onSubmit={handleAddComment}
+              rows={3}
+              disabled={isSubmitting}
+              submitLabel="Post Comment"
+            />
           </div>
 
           {/* Comments List */}

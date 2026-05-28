@@ -8,6 +8,11 @@ import { useNavigate } from "react-router-dom"
 import { formatDistanceToNow } from "date-fns"
 import { usePosts } from "../hooks/usePosts"
 import { Link } from "react-router-dom"
+import {
+  getMentionLookup,
+  renderInteractiveContent,
+} from "@/features/posts/utils/contentTokens"
+
 export default function Post({ post }) {
   const [isLiked, setIsLiked] = useState(post.isLiked || false)
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false)
@@ -58,6 +63,7 @@ export default function Post({ post }) {
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), {
     addSuffix: true,
   })
+  const mentionLookup = getMentionLookup(post.mentions, post.mentionedUsers)
 
   return (
     <>
@@ -91,10 +97,18 @@ export default function Post({ post }) {
         <CardContent
           className="space-y-3"
           onClick={() => {
-            handlePostDetail(post.id)
+            handlePostDetail()
           }}
         >
-          {post.content && <p className="text-sm">{post.content}</p>}
+          {post.content && (
+            <p className="text-sm">
+              {renderInteractiveContent({
+                mentionLookup,
+                navigate,
+                text: post.content,
+              })}
+            </p>
+          )}
 
           {/* Media Grid */}
           {post.mediaUrls && post.mediaUrls.length > 0 && (
@@ -157,7 +171,7 @@ export default function Post({ post }) {
             size="sm"
             className="flex items-center gap-2"
             onClick={() => {
-              handlePostDetail(post.id)
+              handlePostDetail()
             }}
           >
             <MessageCircle className="h-4 w-4" />

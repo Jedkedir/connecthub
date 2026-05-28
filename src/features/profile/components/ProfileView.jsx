@@ -265,7 +265,7 @@ export default function ProfileView({ userId }) {
         </p>
         <div className="flex flex-row items-center gap-8">
           {[
-            [profile?.followerCount ?? "0", "Followers", displayFollowers],
+            [profile?.followersCount ?? "0", "Followers", displayFollowers],
             [profile?.followingCount ?? "0", "Following", displayFollowing],
             [profile?.postCount ?? "0", "Posts", displayPosts],
           ].map(([value, label, fn]) => (

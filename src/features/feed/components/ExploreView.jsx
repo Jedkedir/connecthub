@@ -3,18 +3,75 @@ import { feedService } from "@/features/feed/services/feed.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { debounce } from "@/lib/utils";
 // import PostCard from "./PostCard";
 import Post from "../../posts/components/Post";
+import { Link, useSearchParams } from "react-router-dom";
+// Function 
+const searchType = (searchQuery) => {
+      if (searchQuery.startsWith('@')){
+        return {"user":searchQuery.slice(1)}
+      }
+      else if (searchQuery.startsWith('#')){
+        return {"topic":searchQuery.slice(1)}
+      }
+      else{
+        return {"content":searchQuery}
+      }
+}
+
+const getInitials = (fullname) => {
+  return fullname?.slice(0, 2).toUpperCase() || "U";
+}
+
+function UserResultCard({ user }) {
+  if (!user?._id) return null;
+
+  return (
+    <Link to={`/profile/${user._id}`} className="block">
+      <Card className="mb-4 transition-shadow hover:shadow-md">
+        <CardContent className="flex items-center gap-3 p-4">
+          <Avatar className="h-12 w-12">
+            <AvatarImage
+              src={
+                user.profilePic ||
+                `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.fullname}`
+              }
+            />
+            <AvatarFallback>{getInitials(user.fullname)}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">
+              {user.fullname || "User"}
+            </p>
+            {user.username && (
+              <p className="truncate text-xs text-muted-foreground">
+                @{user.username}
+              </p>
+            )}
+            {user.bio && (
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                {user.bio}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
 
 export default function ExploreView() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchedUser, setSearchedUser] = useState(null);
   const observerRef = useRef();
   const loadingRef = useRef(false); 
 
@@ -25,16 +82,22 @@ export default function ExploreView() {
     try {
       let data;
       if (query.trim()) {
-        data = await feedService.getExploreFeed({ q: query, cursor: cursorParam });
+        data = await feedService.getExploreFeed({ ...searchType(query), cursor: cursorParam });
       } else {
         data = await feedService.getGlobalFeed({ cursor: cursorParam });
       }
       const newPosts = data.data || [];
       setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]));
+      if (reset) {
+        setSearchedUser(data.user || null);
+      }
       setHasMore(data.pageInfo?.hasMore ?? false);
       setCursor(data.pageInfo?.nextCursor ?? null);
     } catch (err) {
       console.error("Failed to load explore feed", err);
+      if (reset) {
+        setSearchedUser(null);
+      }
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -48,16 +111,27 @@ export default function ExploreView() {
       debounce((query) => {
         setIsSearching(true);
         setPosts([]);
+        setSearchedUser(null);
         setCursor(null);
         setHasMore(true);
-        fetchPosts(true, query, null);
+        if (query.trim()) {
+          setSearchParams({ search: query });
+        } else {
+          setSearchParams({});
+        }
       }, 500),
-    [fetchPosts] 
+    [setSearchParams] 
   );
 
   useEffect(() => {
-    fetchPosts(true, "", null);
-  }, [fetchPosts]); 
+    const nextSearchQuery = searchParams.get("search") || "";
+    const timeoutId = window.setTimeout(() => {
+      setSearchQuery(nextSearchQuery);
+      fetchPosts(true, nextSearchQuery, null);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [fetchPosts, searchParams]); 
 
   const loadMore = useCallback(() => {
     if (!hasMore || loadingRef.current || (searchQuery.trim() && isSearching)) return;
@@ -81,7 +155,6 @@ export default function ExploreView() {
     setSearchQuery(value);
     debouncedSearch(value);
   };
-
   return (
     <div className="max-w-4xl mx-auto">
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm pb-4">
@@ -95,29 +168,36 @@ export default function ExploreView() {
       </div>
       {initialLoading ? (
         <div className="text-center py-10 text-muted-foreground">Loading explore feed...</div>
-      ) : posts.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-muted-foreground">
-            {searchQuery.trim()
-              ? `No results found for "${searchQuery}"`
-              : "No posts available yet."}
-          </CardContent>
-        </Card>
       ) : (
-        <ScrollArea className="h-[calc(100vh-10rem)]">
-          {posts.map((post, idx) => (
-            <div key={post._id} ref={idx === posts.length - 1 ? lastPostRef : null}>
-              {/* <PostCard post={post} /> */}
-              <Post post={post} />
-            </div>
-          ))}
-          {loading && <div className="text-center py-4 text-muted-foreground">Loading more...</div>}
-          {!hasMore && posts.length > 0 && (
-            <div className="text-center py-4 text-muted-foreground text-sm">
-              End of the feed 
-            </div>
+        <>
+          <UserResultCard user={searchedUser} />
+          {posts.length === 0 ? (
+            <Card>
+              <CardContent className="py-10 text-center text-muted-foreground">
+                {searchQuery.trim()
+                  ? searchedUser
+                    ? `No posts found for "${searchQuery}"`
+                    : `No results found for "${searchQuery}"`
+                  : "No posts available yet."}
+              </CardContent>
+            </Card>
+          ) : (
+            <ScrollArea className="h-[calc(100vh-10rem)]">
+              {posts.map((post, idx) => (
+                <div key={post._id} ref={idx === posts.length - 1 ? lastPostRef : null}>
+                  {/* <PostCard post={post} /> */}
+                  <Post post={post} />
+                </div>
+              ))}
+              {loading && <div className="text-center py-4 text-muted-foreground">Loading more...</div>}
+              {!hasMore && posts.length > 0 && (
+                <div className="text-center py-4 text-muted-foreground text-sm">
+                  End of the feed 
+                </div>
+              )}
+            </ScrollArea>
           )}
-        </ScrollArea>
+        </>
       )}
     </div>
   );
