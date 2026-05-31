@@ -152,7 +152,7 @@ const CreatePostForm = ({ onPostCreated }) => {
               <div className="relative">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 min-h-20 overflow-hidden whitespace-pre-wrap wrap-break-word p-2 text-base leading-normal text-foreground"
+                  className="pointer-events-none absolute inset-0 min-h-20 overflow-hidden whitespace-pre-wrap wrap-break-word p-2 text-base leading-normal text-foreground md:text-base"
                 >
                   <div style={{ transform: `translateY(-${overlayScrollTop}px)` }}>
                     {content ? renderHighlightedContent(content) : null}
@@ -172,7 +172,7 @@ const CreatePostForm = ({ onPostCreated }) => {
                   onScroll={(event) =>
                     setOverlayScrollTop(event.currentTarget.scrollTop)
                   }
-                  className="relative z-10 min-h-20 resize-none rounded-none border-0 border-b border-gray-200 bg-transparent p-2 text-base text-transparent caret-foreground placeholder:text-muted-foreground placeholder:opacity-100 focus-visible:border-gray-400 focus-visible:ring-0 dark:border-b dark:border-gray-700"
+                  className="relative z-10 min-h-20 resize-none rounded-none border-0 border-b border-gray-200 bg-transparent p-2 text-base leading-normal text-transparent caret-foreground placeholder:text-muted-foreground placeholder:opacity-100 focus-visible:border-gray-400 focus-visible:ring-0 dark:border-b dark:border-gray-700 md:text-base"
                   rows={3}
                   maxLength={500}
                 />

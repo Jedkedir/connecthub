@@ -74,7 +74,7 @@ export default function Follow({ user, currentUser, showActions = true }) {
           className="w-full sm:w-auto"
         >
           <UserMinus className="mr-2 h-4 w-4" />
-          {isLoading ? "Unfollowing..." : "Following"}
+          {isLoading ? "Unfollowing..." : "Unfollow"}
         </Button>
       )
     }

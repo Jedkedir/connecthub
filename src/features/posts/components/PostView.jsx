@@ -675,7 +675,7 @@ export default function PostView({ postId }) {
   const mentionLookup = getMentionLookup(post.mentions, post.mentionedUsers)
 
   return (
-    <div className="min-h-screen rounded-t-full bg-background">
+    <div className="min-h-screen rounded-t-full bg-background ">
       {/* Header with back button */}
       <div className="sticky top-0 z-10 border-b bg-background">
         <div className="container mx-auto max-w-4xl px-4">
@@ -695,7 +695,7 @@ export default function PostView({ postId }) {
 
       <div className="container mx-auto max-w-4xl px-4 py-6">
         {/* Post Content */}
-        <Card className="border-0 shadow-none">
+        <Card className="border-0 shadow-none px-2 ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 px-0">
             <div className="flex items-center space-x-3">
               <Link to={`/profile/${post.authorId?._id}`}>
@@ -800,7 +800,7 @@ export default function PostView({ postId }) {
               onClick={handleLike}
             >
               <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-              Like
+              
             </Button>
 
             <Button
@@ -809,7 +809,7 @@ export default function PostView({ postId }) {
               className="flex items-center gap-2"
             >
               <MessageCircle className="h-4 w-4" />
-              Comment
+              
             </Button>
 
             <Button
@@ -821,7 +821,7 @@ export default function PostView({ postId }) {
               <Bookmark
                 className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
               />
-              Save
+              
             </Button>
 
             <Button
@@ -831,7 +831,7 @@ export default function PostView({ postId }) {
               onClick={handleShare}
             >
               <Share2 className="h-4 w-4" />
-              Share
+              
             </Button>
           </CardFooter>
         </Card>

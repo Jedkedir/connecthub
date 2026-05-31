@@ -284,6 +284,9 @@ export default function ProfileView({ userId }) {
       </section>
 
       <section className="flex flex-col gap-6">
+        {
+          authenticatedUserProfile && (
+
         <div className="flex w-full flex-row items-center justify-between">
           <Button
             className={cn(isActive === "posts" && "bg-accent")}
@@ -313,6 +316,9 @@ export default function ProfileView({ userId }) {
             <FaBookmark />
           </Button>
         </div>
+
+          )
+        }
         <Separator />
 
         {showPosts && <Posts user={profile} setPostCount={setPostCount} />}
