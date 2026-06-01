@@ -1,4 +1,14 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -346,6 +356,7 @@ export default function PostView({ postId }) {
   const [bookmarksCount, setBookmarksCount] = useState(0)
   const [editingCommentId, setEditingCommentId] = useState(null)
   const [editCommentText, setEditCommentText] = useState("")
+  const [commentToDeleteId, setCommentToDeleteId] = useState(null)
   const [cursor, setCursor] = useState(null)
 
   const currentUserId = useAuthStore((state) => state.user?._id)
@@ -579,11 +590,10 @@ export default function PostView({ postId }) {
   }
 
   const handleDeleteComment = async (commentId) => {
-    if (!confirm("Delete this comment?")) return
-
     setIsSubmitting(true)
     try {
       await deleteComment(commentId)
+      setCommentToDeleteId(null)
       setPost((p) =>
         p ? { ...p, commentsCount: Math.max(0, (p.commentsCount || 0) - 1) } : p
       )
@@ -873,7 +883,7 @@ export default function PostView({ postId }) {
                   onLikeComment={handleLikeComment}
                   onEdit={handleEditComment}
                   onSave={handleCommentSave}
-                  onDelete={handleDeleteComment}
+                  onDelete={setCommentToDeleteId}
                   editingId={editingCommentId}
                   editText={editCommentText}
                   setEditText={setEditCommentText}
@@ -896,6 +906,34 @@ export default function PostView({ postId }) {
             )}
           </div>
         </div>
+
+        <AlertDialog
+          open={Boolean(commentToDeleteId)}
+          onOpenChange={(open) => {
+            if (!open) setCommentToDeleteId(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This comment will be permanently removed from the post.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                disabled={isSubmitting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() => handleDeleteComment(commentToDeleteId)}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

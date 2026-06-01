@@ -19,14 +19,31 @@ import {
   renderHighlightedContent,
 } from "@/features/posts/utils/contentTokens"
 
+const EMOJI_GROUPS = [
+  {
+    label: "Smileys",
+    emojis: ["😀", "😁", "😂", "😊", "😍", "🥰", "😎", "🤔", "😅", "🙌"],
+  },
+  {
+    label: "Reactions",
+    emojis: ["👍", "👏", "🔥", "✨", "💯", "❤️", "💙", "🎉", "🚀", "✅"],
+  },
+  {
+    label: "Creative",
+    emojis: ["🎨", "📸", "🎧", "📚", "💡", "✍️", "🌍", "☕", "🌟", "🧠"],
+  },
+]
+
 const CreatePostForm = ({ onPostCreated }) => {
   const user = useAuthStore((state) => state.user)
   const { createPost } = useFeed()
   const [content, setContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [activeToken, setActiveToken] = useState(null)
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false)
   const [overlayScrollTop, setOverlayScrollTop] = useState(0)
   const [selectedMentionUsers, setSelectedMentionUsers] = useState({})
+  const caretPositionRef = useRef(0)
   const textareaRef = useRef(null)
 
   const activeTopics = useMemo(() => extractTopicsFromContent(content), [content])
@@ -45,6 +62,7 @@ const CreatePostForm = ({ onPostCreated }) => {
   }, [activeToken])
 
   const updateActiveToken = (text, caretIndex) => {
+    caretPositionRef.current = caretIndex
     setActiveToken(getActiveToken(text, caretIndex))
   }
 
@@ -97,6 +115,22 @@ const CreatePostForm = ({ onPostCreated }) => {
     })
   }
 
+  const handleEmojiSelect = (emoji) => {
+    const caretPosition =
+      textareaRef.current?.selectionStart ?? caretPositionRef.current
+    const nextContent = `${content.slice(0, caretPosition)}${emoji}${content.slice(caretPosition)}`
+    const nextCaretPosition = caretPosition + emoji.length
+
+    setContent(nextContent)
+    setActiveToken(null)
+
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+      textareaRef.current?.setSelectionRange(nextCaretPosition, nextCaretPosition)
+      caretPositionRef.current = nextCaretPosition
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!content.trim()) return
@@ -112,6 +146,7 @@ const CreatePostForm = ({ onPostCreated }) => {
 
       setContent("")
       setActiveToken(null)
+      setIsEmojiPickerOpen(false)
       setSelectedMentionUsers({})
       onPostCreated()
       toast.success("Posted! Your post is live.")
@@ -260,7 +295,7 @@ const CreatePostForm = ({ onPostCreated }) => {
               )}
 
               <div className="flex items-center justify-between">
-                <div className="flex gap-1">
+                <div className="relative flex gap-1">
                   <Button
                     type="button"
                     variant="ghost"
@@ -274,11 +309,40 @@ const CreatePostForm = ({ onPostCreated }) => {
                     type="button"
                     variant="ghost"
                     size="icon"
+                    aria-expanded={isEmojiPickerOpen}
+                    aria-label="Open emoji picker"
                     className="h-8 w-8 rounded-full text-muted-foreground hover:text-blue-500 transition-colors"
-                    onClick={() => toast.info("Emoji picker will be available soon!")}
+                    onClick={() => setIsEmojiPickerOpen((open) => !open)}
                   >
                     <Smile className="h-4 w-4" />
                   </Button>
+                  {isEmojiPickerOpen && (
+                    <div className="absolute bottom-10 left-0 z-30 max-h-72 w-[min(20rem,calc(100vw-2rem))] overflow-y-auto rounded-lg border bg-popover p-3 text-popover-foreground shadow-lg">
+                      <div className="space-y-3">
+                        {EMOJI_GROUPS.map((group) => (
+                          <div key={group.label} className="space-y-2">
+                            <p className="text-xs font-medium text-muted-foreground">
+                              {group.label}
+                            </p>
+                            <div className="grid grid-cols-5 gap-1 sm:grid-cols-10">
+                              {group.emojis.map((emoji) => (
+                                <Button
+                                  key={`${group.label}-${emoji}`}
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 rounded-md text-lg"
+                                  onClick={() => handleEmojiSelect(emoji)}
+                                >
+                                  {emoji}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -288,6 +352,7 @@ const CreatePostForm = ({ onPostCreated }) => {
                     onClick={() => {
                       setContent("")
                       setActiveToken(null)
+                      setIsEmojiPickerOpen(false)
                       setSelectedMentionUsers({})
                     }}
                     className="text-muted-foreground"
