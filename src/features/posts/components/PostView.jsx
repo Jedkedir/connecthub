@@ -12,7 +12,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
 import {
   Heart,
   MessageCircle,
@@ -169,7 +168,10 @@ function Comment({
   const [showReplyInput, setShowReplyInput] = useState(false)
   const [replyContent, setReplyContent] = useState("")
   const navigate = useNavigate()
-  const mentionLookup = getMentionLookup(comment.mentions, comment.mentionedUsers)
+  const mentionLookup = getMentionLookup(
+    comment.mentions,
+    comment.mentionedUsers
+  )
 
   let timeAgo = "Just now"
 
@@ -180,44 +182,40 @@ function Comment({
   }
 
   const handleSubmitReply = async (content, selectedMentionUsers) => {
-    if (replyContent.trim()) {
+    if (content.trim()) {
       await onReply(comment._id, content, selectedMentionUsers)
       setReplyContent("")
       setShowReplyInput(false)
     }
   }
 
-  let avatarSide = "left"
-  if (currentUserId === comment.userId?._id) {
-    avatarSide = "right"
-  }
   const isOwnComment = currentUserId === comment.userId?._id
 
   return (
-    <div
-      className={`flex space-x-3 ${avatarSide === "right" ? "flex-row-reverse" : ""} items-center gap-1`}
-    >
-      <Link to={`/profile/${comment.userId?._id}`}>
-        <Avatar className="size-10">
-          <AvatarImage
-            src={
-              comment.userId?.profilePic ||
-              "https://api.dicebear.com/9.x/adventurer-neutral/svg"
-            }
-          />
-          <AvatarFallback>
-            {comment.userId?.fullname?.slice(0, 2).toUpperCase() || "User"}
-          </AvatarFallback>
-        </Avatar>
-      </Link>
-      <div className="flex-1">
-        <div className="rounded-lg bg-muted p-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold">
-              {comment.userId?.fullname || "user"}
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">{timeAgo}</p>
+    <article className={isReply ? "border-l pl-4" : ""}>
+      <div className="flex gap-3">
+        <Link to={`/profile/${comment.userId?._id}`} className="shrink-0">
+          <Avatar className="h-9 w-9">
+            <AvatarImage
+              src={
+                comment.userId?.profilePic ||
+                "https://api.dicebear.com/9.x/adventurer-neutral/svg"
+              }
+            />
+            <AvatarFallback>
+              {comment.userId?.fullname?.slice(0, 2).toUpperCase() || "User"}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+        <div className="min-w-0 flex-1">
+          <div className="rounded-lg border bg-card p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">
+                  {comment.userId?.fullname || "user"}
+                </p>
+                <p className="text-xs text-muted-foreground">{timeAgo}</p>
+              </div>
               {isOwnComment && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -242,104 +240,109 @@ function Comment({
                 </DropdownMenu>
               )}
             </div>
-          </div>
-          {editingId === comment._id ? (
-            <Textarea
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              className="mt-2 text-sm"
-              rows={2}
-            />
-          ) : (
-            <p className="mt-1 text-sm">
-              {renderInteractiveContent({
-                mentionLookup,
-                navigate,
-                text: comment.content,
-              })}
-            </p>
-          )}
-        </div>
-        {editingId === comment._id && (
-          <div className="mt-2 ml-2 flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => onSave(comment._id)}
-              className="h-auto py-1 text-xs"
-            >
-              Save
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => onEdit(null)}
-              className="h-auto py-1 text-xs"
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
-        <div className="mt-1 ml-2 flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`h-auto p-0 text-xs ${isLiked ? "text-red-500" : ""}`}
-            onClick={() => {
-              setIsLiked(!isLiked)
-              onLikeComment?.(comment._id)
-            }}
-          >
-            <Heart
-              className={`mr-1 h-3 w-3 ${isLiked ? "fill-current" : ""}`}
-            />
-            {comment.likesCount || 0}
-          </Button>
-          {!isReply && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto p-0 text-xs"
-              onClick={() => setShowReplyInput(!showReplyInput)}
-            >
-              <MessageCircle className="mr-1 h-3 w-3" />
-              Reply
-            </Button>
-          )}
-        </div>
-        {showReplyInput && (
-          <div className="mt-2 flex items-start space-x-2">
-            <MentionCommentInput
-              placeholder="Write a reply..."
-              value={replyContent}
-              onChange={setReplyContent}
-              onSubmit={handleSubmitReply}
-              rows={2}
-              submitLabel=""
-            />
-          </div>
-        )}
-        {comment.replies && comment.replies.length > 0 && (
-          <div className="mt-2 ml-6 space-y-2">
-            {comment.replies.map((reply) => (
-              <Comment
-                key={reply._id}
-                comment={reply}
-                onReply={onReply}
-                onLikeComment={onLikeComment}
-                onEdit={onEdit}
-                onSave={onSave}
-                onDelete={onDelete}
-                editingId={editingId}
-                editText={editText}
-                setEditText={setEditText}
-                currentUserId={currentUserId}
-                isReply={true}
+
+            {editingId === comment._id ? (
+              <Textarea
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                className="mt-3 min-h-16 resize-none text-sm"
+                rows={2}
               />
-            ))}
+            ) : (
+              <p className="mt-3 text-sm leading-6">
+                {renderInteractiveContent({
+                  mentionLookup,
+                  navigate,
+                  text: comment.content,
+                })}
+              </p>
+            )}
           </div>
-        )}
+
+          <div className="mt-2 flex flex-wrap items-center gap-3 pl-1">
+            {editingId === comment._id ? (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => onSave(comment._id)}
+                  className="h-7 px-3 text-xs"
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onEdit(null)}
+                  className="h-7 px-3 text-xs"
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : null}
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-7 gap-1 px-2 text-xs ${isLiked ? "text-red-500" : "text-muted-foreground"}`}
+              onClick={() => {
+                setIsLiked(!isLiked)
+                onLikeComment?.(comment._id)
+              }}
+            >
+              <Heart
+                className={`h-3.5 w-3.5 ${isLiked ? "fill-current" : ""}`}
+              />
+              {comment.likesCount || 0}
+            </Button>
+
+            {!isReply && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 gap-1 px-2 text-xs text-muted-foreground"
+                onClick={() => setShowReplyInput(!showReplyInput)}
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                Reply
+              </Button>
+            )}
+          </div>
+
+          {showReplyInput && (
+            <div className="mt-3 rounded-lg border bg-muted/30 p-3">
+              <MentionCommentInput
+                placeholder="Write a reply..."
+                value={replyContent}
+                onChange={setReplyContent}
+                onSubmit={handleSubmitReply}
+                rows={2}
+                submitLabel="Reply"
+              />
+            </div>
+          )}
+
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="mt-4 space-y-4">
+              {comment.replies.map((reply) => (
+                <Comment
+                  key={reply._id}
+                  comment={reply}
+                  onReply={onReply}
+                  onLikeComment={onLikeComment}
+                  onEdit={onEdit}
+                  onSave={onSave}
+                  onDelete={onDelete}
+                  editingId={editingId}
+                  editText={editText}
+                  setEditText={setEditText}
+                  currentUserId={currentUserId}
+                  isReply={true}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -445,7 +448,10 @@ export default function PostView({ postId }) {
     refreshComments()
   }, [isSubmitting, postId, fetchComments])
 
-  const handleAddComment = async (content = newComment, selectedMentionUsers = {}) => {
+  const handleAddComment = async (
+    content = newComment,
+    selectedMentionUsers = {}
+  ) => {
     if (!content.trim()) return
 
     setIsSubmitting(true)
@@ -685,31 +691,33 @@ export default function PostView({ postId }) {
   const mentionLookup = getMentionLookup(post.mentions, post.mentionedUsers)
 
   return (
-    <div className="min-h-screen rounded-t-full bg-background ">
-      {/* Header with back button */}
-      <div className="sticky top-0 z-10 border-b bg-background">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="flex items-center space-x-4 py-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="h-8 w-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <h1 className="text-xl font-semibold">Post</h1>
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="h-9 w-9 rounded-full"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-base font-semibold">Post</h1>
+            <p className="text-xs text-muted-foreground">Conversation detail</p>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto max-w-4xl px-4 py-6">
-        {/* Post Content */}
-        <Card className="border-0 shadow-none px-2 ">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 px-0">
-            <div className="flex items-center space-x-3">
-              <Link to={`/profile/${post.authorId?._id}`}>
-                <Avatar>
+      <main className="mx-auto max-w-3xl px-4 py-6">
+        <Card className="overflow-hidden rounded-lg border shadow-none">
+          <CardHeader className="space-y-0 border-b p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <Link
+                to={`/profile/${post.authorId?._id}`}
+                className="flex min-w-0 items-center gap-3"
+              >
+                <Avatar className="h-11 w-11">
                   <AvatarImage
                     src={
                       post.authorId?.profilePic ||
@@ -720,35 +728,35 @@ export default function PostView({ postId }) {
                     {getInitials(post.authorId?.fullname)}
                   </AvatarFallback>
                 </Avatar>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">
+                    {post.authorId?.fullname || "User"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{timeAgo}</p>
+                </div>
               </Link>
-              <div>
-                <p className="text-sm font-semibold">
-                  {post.authorId?.fullname}
-                </p>
-                <p className="text-xs text-muted-foreground">{timeAgo}</p>
-              </div>
-            </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {ownPost && (
-                  <DropdownMenuItem onClick={handleDeletePost}>
-                    Delete Post
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem>Report Post</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {ownPost && (
+                    <DropdownMenuItem onClick={handleDeletePost}>
+                      Delete Post
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem>Report Post</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </CardHeader>
-          <Separator />
-          <CardContent className="space-y-3 px-0">
+
+          <CardContent className="space-y-5 p-4 sm:p-5">
             {post.content && (
-              <p className="text-sm">
+              <p className="text-base leading-7 whitespace-pre-wrap">
                 {renderInteractiveContent({
                   mentionLookup,
                   navigate,
@@ -757,10 +765,9 @@ export default function PostView({ postId }) {
               </p>
             )}
 
-            {/* Media Grid */}
             {post.mediaUrls && post.mediaUrls.length > 0 && (
               <div
-                className={`grid gap-2 ${
+                className={`grid overflow-hidden rounded-lg border ${
                   post.mediaUrls.length === 1
                     ? "grid-cols-1"
                     : post.mediaUrls.length === 2
@@ -771,7 +778,7 @@ export default function PostView({ postId }) {
                 {post.mediaUrls.map((url, idx) => (
                   <div
                     key={idx}
-                    className={`relative overflow-hidden rounded-lg ${
+                    className={`relative overflow-hidden bg-muted ${
                       post.mediaUrls.length === 3 && idx === 0
                         ? "row-span-2"
                         : ""
@@ -788,92 +795,96 @@ export default function PostView({ postId }) {
               </div>
             )}
 
-            {/* Stats Bar */}
-            <div className="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
                 <Eye className="h-3 w-3" />
-                <span>{post.viewCount || 0} views</span>
-              </div>
-              <div className="flex items-center space-x-4">
-                <span>{likesCount} likes</span>
-                <span>{post.commentsCount || 0} comments</span>
-                <span>{bookmarksCount} saves</span>
-              </div>
+                {post.viewCount || 0} views
+              </span>
+              <span>{likesCount} likes</span>
+              <span>{post.commentsCount || 0} comments</span>
+              <span>{bookmarksCount} saves</span>
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-between px-0">
+          <CardFooter className="grid grid-cols-4 border-t p-2">
             <Button
               variant="ghost"
               size="sm"
-              className={`flex items-center gap-2 ${isLiked ? "text-red-500" : ""}`}
+              className={`gap-2 rounded-md ${isLiked ? "text-red-500" : "text-muted-foreground"}`}
               onClick={handleLike}
             >
               <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-              
+              <span className="hidden sm:inline">Like</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center gap-2"
+              className="gap-2 rounded-md text-muted-foreground"
             >
               <MessageCircle className="h-4 w-4" />
-              
+              <span className="hidden sm:inline">Comment</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className={`flex items-center gap-2 ${isBookmarked ? "text-yellow-500" : ""}`}
+              className={`gap-2 rounded-md ${isBookmarked ? "text-yellow-500" : "text-muted-foreground"}`}
               onClick={handleBookmark}
             >
               <Bookmark
                 className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
               />
-              
+              <span className="hidden sm:inline">Save</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center gap-2"
+              className="gap-2 rounded-md text-muted-foreground"
               onClick={handleShare}
             >
               <Share2 className="h-4 w-4" />
-              
+              <span className="hidden sm:inline">Share</span>
             </Button>
           </CardFooter>
         </Card>
 
-        {/* Comments Section */}
-        <div className="mt-6 border-t pt-6">
-          <h3 className="mb-4 font-semibold">
-            Comments ({post.commentsCount || 0})
-          </h3>
-
-          {/* Add Comment Input */}
-          <div className="mb-6 flex space-x-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>ME</AvatarFallback>
-            </Avatar>
-            <MentionCommentInput
-              placeholder="Write a comment..."
-              value={newComment}
-              onChange={setNewComment}
-              onSubmit={handleAddComment}
-              rows={3}
-              disabled={isSubmitting}
-              submitLabel="Post Comment"
-            />
+        <section className="mt-5 rounded-lg border bg-card">
+          <div className="flex items-center justify-between border-b px-4 py-3 sm:px-5">
+            <div>
+              <h2 className="font-semibold">Comments</h2>
+              <p className="text-xs text-muted-foreground">
+                {post.commentsCount || 0} in this conversation
+              </p>
+            </div>
           </div>
 
-          {/* Comments List */}
-          <div className="space-y-4">
+          <div className="border-b p-4 sm:p-5">
+            <div className="flex gap-3">
+              <Avatar className="h-9 w-9 shrink-0">
+                <AvatarFallback>ME</AvatarFallback>
+              </Avatar>
+              <MentionCommentInput
+                placeholder="Write a comment..."
+                value={newComment}
+                onChange={setNewComment}
+                onSubmit={handleAddComment}
+                rows={3}
+                disabled={isSubmitting}
+                submitLabel="Post Comment"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-5 p-4 sm:p-5">
             {comments.length === 0 ? (
-              <p className="py-8 text-center text-muted-foreground">
-                No comments yet. Be the first to comment!
-              </p>
+              <div className="rounded-lg border border-dashed py-10 text-center">
+                <p className="font-medium">No comments yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Be the first to start the conversation.
+                </p>
+              </div>
             ) : (
               comments.map((comment) => (
                 <Comment
@@ -905,7 +916,7 @@ export default function PostView({ postId }) {
               </div>
             )}
           </div>
-        </div>
+        </section>
 
         <AlertDialog
           open={Boolean(commentToDeleteId)}
@@ -934,7 +945,7 @@ export default function PostView({ postId }) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
+      </main>
     </div>
   )
 }
