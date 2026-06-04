@@ -1,32 +1,42 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { feedService } from "@/features/feed/services/feed.service";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { debounce } from "@/lib/utils";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
+import { feedService } from "@/features/feed/services/feed.service"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { debounce } from "@/lib/utils"
 // import PostCard from "./PostCard";
-import Post from "../../posts/components/Post";
-import { Link, useSearchParams } from "react-router-dom";
-// Function 
+import Post from "../../posts/components/Post"
+import { Link, useSearchParams } from "react-router-dom"
+// Function
 const searchType = (searchQuery) => {
-      if (searchQuery.startsWith('@')){
-        return {"user":searchQuery.slice(1)}
-      }
-      else if (searchQuery.startsWith('#')){
-        return {"topic":searchQuery.slice(1)}
-      }
-      else{
-        return {"content":searchQuery}
-      }
+  if (searchQuery.startsWith("@")) {
+    return { user: searchQuery.slice(1) }
+  } else if (searchQuery.startsWith("#")) {
+    return { topic: searchQuery.slice(1) }
+  } else {
+    return { content: searchQuery }
+  }
+}
+
+// Return true when the query should trigger a server request.
+const isValidSearch = (q) => {
+  const trimmed = (q || "").trim()
+  if (!trimmed) return false
+  if (
+    (trimmed.startsWith("@") || trimmed.startsWith("#")) &&
+    trimmed.length === 1
+  )
+    return false
+  return true
 }
 
 const getInitials = (fullname) => {
-  return fullname?.slice(0, 2).toUpperCase() || "U";
+  return fullname?.slice(0, 2).toUpperCase() || "U"
 }
 
 function UserResultCard({ user }) {
-  if (!user?._id) return null;
+  if (!user?._id) return null
 
   return (
     <Link to={`/profile/${user._id}`} className="block">
@@ -59,105 +69,116 @@ function UserResultCard({ user }) {
         </CardContent>
       </Card>
     </Link>
-  );
+  )
 }
 
 export default function ExploreView() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [posts, setPosts] = useState([]);
-  const [cursor, setCursor] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchedUser, setSearchedUser] = useState(null);
-  const observerRef = useRef();
-  const loadingRef = useRef(false); 
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [posts, setPosts] = useState([])
+  const [cursor, setCursor] = useState(null)
+  const [hasMore, setHasMore] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  )
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchedUser, setSearchedUser] = useState(null)
+  const observerRef = useRef()
+  const loadingRef = useRef(false)
 
   const fetchPosts = useCallback(async (reset, query, cursorParam) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
-    setLoading(true);
+    if (loadingRef.current) return
+    loadingRef.current = true
+    setLoading(true)
     try {
-      let data;
-      if (query.trim()) {
-        data = await feedService.getExploreFeed({ ...searchType(query), cursor: cursorParam });
+      let data
+      const trimmed = (query || "").trim()
+      if (isValidSearch(trimmed)) {
+        const params = { ...searchType(trimmed), cursor: cursorParam }
+        // avoid sending empty user/topic values (e.g. "@" or "#")
+        const value = params.user ?? params.topic ?? params.content
+        if (!value) {
+          data = await feedService.getGlobalFeed({ cursor: cursorParam })
+        } else {
+          data = await feedService.getExploreFeed(params)
+        }
       } else {
-        data = await feedService.getGlobalFeed({ cursor: cursorParam });
+        data = await feedService.getGlobalFeed({ cursor: cursorParam })
       }
-      const newPosts = data.data || [];
-      setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]));
+      const newPosts = data.data || []
+      setPosts((prev) => (reset ? newPosts : [...prev, ...newPosts]))
       if (reset) {
-        setSearchedUser(data.user || null);
+        setSearchedUser(data.user || null)
       }
-      setHasMore(data.pageInfo?.hasMore ?? false);
-      setCursor(data.pageInfo?.nextCursor ?? null);
+      setHasMore(data.pageInfo?.hasMore ?? false)
+      setCursor(data.pageInfo?.nextCursor ?? null)
     } catch (err) {
-      console.error("Failed to load explore feed", err);
+      console.error("Failed to load explore feed", err)
       if (reset) {
-        setSearchedUser(null);
+        setSearchedUser(null)
       }
     } finally {
-      loadingRef.current = false;
-      setLoading(false);
-      if (reset) setInitialLoading(false);
-      setIsSearching(false);
+      loadingRef.current = false
+      setLoading(false)
+      if (reset) setInitialLoading(false)
+      setIsSearching(false)
     }
-  }, []); 
+  }, [])
 
   const debouncedSearch = useMemo(
     () =>
       debounce((query) => {
-        setIsSearching(true);
-        setPosts([]);
-        setSearchedUser(null);
-        setCursor(null);
-        setHasMore(true);
+        setIsSearching(true)
+        setPosts([])
+        setSearchedUser(null)
+        setCursor(null)
+        setHasMore(true)
         if (query.trim()) {
-          setSearchParams({ search: query });
+          setSearchParams({ search: query })
         } else {
-          setSearchParams({});
+          setSearchParams({})
         }
       }, 500),
-    [setSearchParams] 
-  );
+    [setSearchParams]
+  )
 
   useEffect(() => {
-    const nextSearchQuery = searchParams.get("search") || "";
+    const nextSearchQuery = searchParams.get("search") || ""
     const timeoutId = window.setTimeout(() => {
-      setSearchQuery(nextSearchQuery);
-      fetchPosts(true, nextSearchQuery, null);
-    }, 0);
+      setSearchQuery(nextSearchQuery)
+      fetchPosts(true, nextSearchQuery, null)
+    }, 0)
 
-    return () => window.clearTimeout(timeoutId);
-  }, [fetchPosts, searchParams]); 
+    return () => window.clearTimeout(timeoutId)
+  }, [fetchPosts, searchParams])
 
   const loadMore = useCallback(() => {
-    if (!hasMore || loadingRef.current || (searchQuery.trim() && isSearching)) return;
-    fetchPosts(false, searchQuery, cursor);
-  }, [hasMore, searchQuery, cursor, fetchPosts, isSearching]);
+    if (!hasMore || loadingRef.current || (searchQuery.trim() && isSearching))
+      return
+    fetchPosts(false, searchQuery, cursor)
+  }, [hasMore, searchQuery, cursor, fetchPosts, isSearching])
 
   const lastPostRef = useCallback(
     (node) => {
-      if (loadingRef.current) return;
-      if (observerRef.current) observerRef.current.disconnect();
+      if (loadingRef.current) return
+      if (observerRef.current) observerRef.current.disconnect()
       observerRef.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) loadMore();
-      });
-      if (node) observerRef.current.observe(node);
+        if (entries[0].isIntersecting && hasMore) loadMore()
+      })
+      if (node) observerRef.current.observe(node)
     },
     [hasMore, loadMore]
-  );
+  )
 
   const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    debouncedSearch(value);
-  };
+    const value = e.target.value
+    setSearchQuery(value)
+    debouncedSearch(value)
+  }
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm pb-4">
+    <div className="mx-auto max-w-4xl">
+      <div className="sticky top-0 z-10 bg-background/80 pb-4 backdrop-blur-sm">
         <Input
           type="text"
           placeholder="Search posts, users, or topics..."
@@ -167,7 +188,9 @@ export default function ExploreView() {
         />
       </div>
       {initialLoading ? (
-        <div className="text-center py-10 text-muted-foreground">Loading explore feed...</div>
+        <div className="py-10 text-center text-muted-foreground">
+          Loading explore feed...
+        </div>
       ) : (
         <>
           <UserResultCard user={searchedUser} />
@@ -184,15 +207,22 @@ export default function ExploreView() {
           ) : (
             <ScrollArea className="h-[calc(100vh-10rem)]">
               {posts.map((post, idx) => (
-                <div key={post._id} ref={idx === posts.length - 1 ? lastPostRef : null}>
+                <div
+                  key={post._id}
+                  ref={idx === posts.length - 1 ? lastPostRef : null}
+                >
                   {/* <PostCard post={post} /> */}
                   <Post post={post} />
                 </div>
               ))}
-              {loading && <div className="text-center py-4 text-muted-foreground">Loading more...</div>}
+              {loading && (
+                <div className="py-4 text-center text-muted-foreground">
+                  Loading more...
+                </div>
+              )}
               {!hasMore && posts.length > 0 && (
-                <div className="text-center py-4 text-muted-foreground text-sm">
-                  End of the feed 
+                <div className="py-4 text-center text-sm text-muted-foreground">
+                  End of the feed
                 </div>
               )}
             </ScrollArea>
@@ -200,5 +230,5 @@ export default function ExploreView() {
         </>
       )}
     </div>
-  );
+  )
 }
