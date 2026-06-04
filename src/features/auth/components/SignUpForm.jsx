@@ -51,7 +51,7 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
             autoComplete="name"
             id="signup-name"
             onChange={(event) => setFullName(event.target.value)}
-            placeholder="John Doe"
+            placeholder="Full name"
             required
             type="text"
             value={fullName}

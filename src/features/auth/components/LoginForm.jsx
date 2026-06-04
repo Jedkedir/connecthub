@@ -8,14 +8,12 @@ import {
   InputGroupInput,
   InputGroupButton,
 } from "@/components/ui/input-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+
 import { Separator } from "@/components/ui/separator"
 
 export default function LoginForm({ error, isLoading, onSubmit }) {
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
   const togglePasswordVisibility = () => {
@@ -28,7 +26,6 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
       await onSubmit({
         email: identifier,
         password,
-        rememberMe,
       })
 
       setPassword("")
@@ -80,22 +77,6 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
           </InputGroupButton>
         </InputGroup>
       </Field>
-
-      <div className="flex flex-row items-center justify-between gap-6">
-        <div className="flex flex-row items-center gap-2">
-          <Checkbox
-            checked={rememberMe}
-            id="remember"
-            onChange={(event) => setRememberMe(event.target.checked)}
-          />
-          <Label htmlFor="remember" className="text-muted-foreground">
-            Remember me
-          </Label>
-        </div>
-        <Button type="button" variant="link" className="h-auto p-0">
-          Forgot Password?
-        </Button>
-      </div>
 
       {error ? (
         <p className="text-sm text-destructive" role="alert">

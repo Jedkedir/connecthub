@@ -23,7 +23,7 @@ export default function Auth() {
     registerState.error?.response?.data?.error?.message ??
     registerState.error?.message ??
     ""
-  
+
   const handleLogin = async (payload) => {
     setNotice("")
     await login(payload)
@@ -45,8 +45,7 @@ export default function Auth() {
         <div className="flex flex-col gap-4">
           <h1 className="text-5xl font-bold tracking-normal">ConnectHub</h1>
           <p className="max-w-xl text-lg text-muted-foreground">
-            The Digital Atelier. A curated space for visionaries to connect,
-            create, and inspire.
+            Create. Connect. Inspire.
           </p>
         </div>
 
@@ -141,7 +140,7 @@ export default function Auth() {
           </Card>
 
           <p className="text-center text-xs text-muted-foreground">
-            @ 2026 ConnectHub Digital Atelier. Crafter with precision.
+            © 2026 ConnectHub · Create. Connect. Inspire.
           </p>
         </div>
       </section>
