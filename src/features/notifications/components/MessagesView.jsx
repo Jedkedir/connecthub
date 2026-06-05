@@ -20,7 +20,8 @@ import { cn } from "@/shared/utils/cn"
 
 const NOTIFICATION_TYPE_COLORS = {
   LIKE: "bg-rose-50 text-rose-600 ring-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:ring-rose-900",
-  COMMENT: "bg-sky-50 text-sky-600 ring-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:ring-sky-900",
+  COMMENT:
+    "bg-sky-50 text-sky-600 ring-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:ring-sky-900",
   FOLLOW_REQUEST:
     "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:ring-amber-900",
   FOLLOW_ACCEPTED:
@@ -98,7 +99,7 @@ export default function MessagesView({
       onClick={() => onOpen?.(notification)}
     >
       {!notification.isRead ? (
-        <span className="absolute left-0 top-0 h-full w-1 bg-primary" />
+        <span className="absolute top-0 left-0 h-full w-1 bg-primary" />
       ) : null}
       <div className="p-4 sm:p-5">
         <div className="flex items-start gap-3 sm:gap-4">
@@ -111,7 +112,7 @@ export default function MessagesView({
             </Avatar>
             <span
               className={cn(
-                "absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-background",
+                "absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full ring-2 ring-background",
                 NOTIFICATION_TYPE_COLORS[notification.type]
               )}
             >
@@ -160,7 +161,7 @@ export default function MessagesView({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-muted-foreground opacity-100 hover:bg-destructive/10 hover:text-destructive sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+                  className="h-8 w-8 text-muted-foreground opacity-100 hover:bg-destructive/10 hover:text-destructive sm:opacity-0 sm:transition-opacity sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
                   onClick={(event) => {
                     event.stopPropagation()
                     onDelete?.(notification._id)

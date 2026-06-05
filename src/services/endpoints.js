@@ -49,6 +49,6 @@ export const endpoints = {
     byUsername: (username) => `/users/search/username/${username}`,
     me: "/users/me",
     update: "/users/update",
-    search:(query) => `/users/search?query=${encodeURIComponent(query)}`,
+    search: (query) => `/users/search?query=${encodeURIComponent(query)}`,
   },
 }

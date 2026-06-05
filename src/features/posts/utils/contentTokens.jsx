@@ -89,7 +89,11 @@ const getUserByMention = async (mention) => {
 
   try {
     const response = await profileService.getUserByUsername(username)
-    console.log("User search response for mention", mention, normalizeUserResponse(response))
+    console.log(
+      "User search response for mention",
+      mention,
+      normalizeUserResponse(response)
+    )
     return normalizeUserResponse(response)
   } catch (error) {
     console.error("Could not resolve mentioned user", error)
@@ -159,10 +163,17 @@ export const renderInteractiveContent = ({
         onClick={async (event) => {
           event.stopPropagation()
           if (isMention) {
-            const resolvedUser = profileId ? null : await getUserByMention(token)
-            const  resolvedProfileId = profileId ||await  getUserId(resolvedUser)
-            console.log("Resolved profile ID for mention", token, resolvedProfileId)
-            
+            const resolvedUser = profileId
+              ? null
+              : await getUserByMention(token)
+            const resolvedProfileId =
+              profileId || (await getUserId(resolvedUser))
+            console.log(
+              "Resolved profile ID for mention",
+              token,
+              resolvedProfileId
+            )
+
             if (resolvedProfileId) {
               navigate(`/profile/${resolvedProfileId}`)
             }

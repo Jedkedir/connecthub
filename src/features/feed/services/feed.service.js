@@ -1,10 +1,11 @@
 import api from "@/services/apiClient"
 import { endpoints } from "@/services/endpoints"
 
-
 export const feedService = {
   createPost(payload) {
-    return api.post(endpoints.posts.create, payload).then((response) => response.data)
+    return api
+      .post(endpoints.posts.create, payload)
+      .then((response) => response.data)
   },
   getExploreFeed(params) {
     return api

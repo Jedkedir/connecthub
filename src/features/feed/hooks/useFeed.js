@@ -20,6 +20,11 @@ export function useFeed() {
       getPersonalizedFeed: personalizedFeedAction.execute,
       getPersonalizedFeedState: personalizedFeedAction,
     }),
-    [createPostAction, exploreFeedAction, globalFeedAction, personalizedFeedAction]
+    [
+      createPostAction,
+      exploreFeedAction,
+      globalFeedAction,
+      personalizedFeedAction,
+    ]
   )
 }

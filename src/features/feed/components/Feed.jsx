@@ -1,12 +1,9 @@
-
-
 import { useState, useEffect, useCallback, useRef } from "react"
 import { feedService } from "@/features/feed/services/feed.service"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Post from "../../posts/components/Post"
 import CreatePostForm from "./CreatePost"
-
 
 export default function Feed() {
   const [posts, setPosts] = useState([])

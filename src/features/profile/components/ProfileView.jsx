@@ -50,8 +50,6 @@ export default function ProfileView({ userId }) {
   const getProfile = async (id) => {
     if (!id) return null
     if (authenticatedUserProfile) {
-      // if current user, prefer currentUser from store
-      //if (currentUser) return { user: currentUser, isFollowing: false }
       const response = await getCurrentUser()
       return response
     }
@@ -284,41 +282,37 @@ export default function ProfileView({ userId }) {
       </section>
 
       <section className="flex flex-col gap-6">
-        {
-          authenticatedUserProfile && (
-
-        <div className="flex w-full flex-row items-center justify-between">
-          <Button
-            className={cn(isActive === "posts" && "bg-accent")}
-            onClick={displayPosts}
-            size="icon"
-            type="button"
-            variant="ghost"
-          >
-            <PiSquaresFourFill />
-          </Button>
-          <Button
-            className={cn(isActive === "likes" && "bg-accent")}
-            onClick={displayLikes}
-            size="icon"
-            type="button"
-            variant="ghost"
-          >
-            <FaHeart />
-          </Button>
-          <Button
-            className={cn(isActive === "saved" && "bg-accent")}
-            onClick={displaySaved}
-            size="icon"
-            type="button"
-            variant="ghost"
-          >
-            <FaBookmark />
-          </Button>
-        </div>
-
-          )
-        }
+        {authenticatedUserProfile && (
+          <div className="flex w-full flex-row items-center justify-between">
+            <Button
+              className={cn(isActive === "posts" && "bg-accent")}
+              onClick={displayPosts}
+              size="icon"
+              type="button"
+              variant="ghost"
+            >
+              <PiSquaresFourFill />
+            </Button>
+            <Button
+              className={cn(isActive === "likes" && "bg-accent")}
+              onClick={displayLikes}
+              size="icon"
+              type="button"
+              variant="ghost"
+            >
+              <FaHeart />
+            </Button>
+            <Button
+              className={cn(isActive === "saved" && "bg-accent")}
+              onClick={displaySaved}
+              size="icon"
+              type="button"
+              variant="ghost"
+            >
+              <FaBookmark />
+            </Button>
+          </div>
+        )}
         <Separator />
 
         {showPosts && <Posts user={profile} setPostCount={setPostCount} />}

@@ -103,7 +103,10 @@ export default function NotificationsView() {
         </CardHeader>
         <CardContent className="space-y-1 p-0">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-start gap-3 border-b p-4 last:border-b-0">
+            <div
+              key={i}
+              className="flex items-start gap-3 border-b p-4 last:border-b-0"
+            >
               <Skeleton className="h-11 w-11 rounded-full" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-4/5" />
@@ -127,71 +130,75 @@ export default function NotificationsView() {
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                   <Bell className="h-5 w-5" />
                 </span>
-              Notifications
-              {unreadCount > 0 && (
+                Notifications
+                {unreadCount > 0 && (
                   <Badge variant="destructive" className="rounded-full text-xs">
-                  {unreadCount}
-                </Badge>
-              )}
-            </CardTitle>
+                    {unreadCount}
+                  </Badge>
+                )}
+              </CardTitle>
               <p className="text-sm text-muted-foreground">
                 {unreadCount > 0
                   ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
                   : "You are all caught up"}
               </p>
-          </div>
+            </div>
 
             <div className="flex flex-wrap gap-2 sm:justify-end">
-            {unreadCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMarkAllAsRead}
-                  className="h-9 w-full gap-2 sm:w-auto"
-              >
-                <CheckCheck className="h-4 w-4" />
-                  Mark read
-              </Button>
-            )}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              {unreadCount > 0 && (
                 <Button
                   variant="outline"
                   size="sm"
-                    className="h-9 w-full gap-2 sm:w-auto"
+                  onClick={handleMarkAllAsRead}
+                  className="h-9 w-full gap-2 sm:w-auto"
                 >
+                  <CheckCheck className="h-4 w-4" />
+                  Mark read
+                </Button>
+              )}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 w-full gap-2 sm:w-auto"
+                  >
                     <Filter className="h-4 w-4" />
                     {currentFilterLabel}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Notification Type</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setFilterType("all")}>
-                  All Notifications
-                    {filterType === "all" && <Check className="ml-auto h-4 w-4" />}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterType("unread")}>
-                  Unread
-                  {filterType === "unread" && (
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Notification Type</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setFilterType("all")}>
+                    All Notifications
+                    {filterType === "all" && (
                       <Check className="ml-auto h-4 w-4" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setFilterType("unread")}>
+                    Unread
+                    {filterType === "unread" && (
+                      <Check className="ml-auto h-4 w-4" />
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {Object.entries(NOTIFICATION_TYPE_LABELS).map(
+                    ([key, label]) => (
+                      <DropdownMenuItem
+                        key={key}
+                        onClick={() => setFilterType(key)}
+                      >
+                        {label}
+                        {filterType === key && (
+                          <Check className="ml-auto h-4 w-4" />
+                        )}
+                      </DropdownMenuItem>
+                    )
                   )}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {Object.entries(NOTIFICATION_TYPE_LABELS).map(
-                  ([key, label]) => (
-                    <DropdownMenuItem
-                      key={key}
-                      onClick={() => setFilterType(key)}
-                    >
-                      {label}
-                      {filterType === key && <Check className="ml-auto h-4 w-4" />}
-                    </DropdownMenuItem>
-                  )
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
