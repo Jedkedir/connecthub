@@ -7,7 +7,6 @@ import { toast } from "sonner"
 import { Check, Image, Smile, X } from "lucide-react"
 import { useAuthStore } from "@/features/auth"
 import { useFeed } from "@/features/feed"
-import { useUserSearch } from "@/features/profile/hooks/useUserSearch"
 import {
   DEFAULT_TOPICS,
   extractMentionsFromContent,
@@ -15,7 +14,6 @@ import {
   getActiveToken,
   getMentionPayload,
   getTopicPayload,
-  getUserId,
   renderHighlightedContent,
 } from "@/features/posts/utils/contentTokens"
 import { createPostSchema } from "@/validators/postValidator"
@@ -44,17 +42,17 @@ const CreatePostForm = ({ onPostCreated }) => {
   const [activeToken, setActiveToken] = useState(null)
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false)
   const [overlayScrollTop, setOverlayScrollTop] = useState(0)
-  const [selectedMentionUsers, setSelectedMentionUsers] = useState({})
   const caretPositionRef = useRef(0)
   const textareaRef = useRef(null)
 
-  const activeTopics = useMemo(() => extractTopicsFromContent(content), [content])
-  const activeMentions = useMemo(() => extractMentionsFromContent(content), [content])
-  const mentionQuery = activeToken?.type === "mention" ? activeToken.query : ""
-  const { users: mentionSuggestions } = useUserSearch(mentionQuery, 5, {
-    enabled: activeToken?.type === "mention",
-    minLength: 0,
-  })
+  const activeTopics = useMemo(
+    () => extractTopicsFromContent(content),
+    [content]
+  )
+  const activeMentions = useMemo(
+    () => extractMentionsFromContent(content),
+    [content]
+  )
 
   const topicSuggestions = useMemo(() => {
     const query = activeToken?.type === "topic" ? activeToken.query : ""
@@ -74,32 +72,6 @@ const CreatePostForm = ({ onPostCreated }) => {
     updateActiveToken(newContent, e.target.selectionStart)
   }
 
-  const handleSelectToken = (value, selectedUser) => {
-    if (!activeToken) return
-
-    const nextContent = `${content.slice(0, activeToken.start)}${value} ${content.slice(activeToken.end)}`
-    const nextCaretPosition = activeToken.start + value.length + 1
-
-    if (selectedUser) {
-      const userId = getUserId(selectedUser)
-      setSelectedMentionUsers((prev) => ({
-        ...prev,
-        [value.toLowerCase()]: {
-          id: userId,
-          username: selectedUser.username,
-        },
-      }))
-    }
-
-    setContent(nextContent)
-    setActiveToken(null)
-
-    requestAnimationFrame(() => {
-      textareaRef.current?.focus()
-      textareaRef.current?.setSelectionRange(nextCaretPosition, nextCaretPosition)
-    })
-  }
-
   const handleInsertTopic = (topic) => {
     if (activeTopics.includes(topic)) {
       textareaRef.current?.focus()
@@ -113,7 +85,10 @@ const CreatePostForm = ({ onPostCreated }) => {
 
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
-      textareaRef.current?.setSelectionRange(nextContent.length, nextContent.length)
+      textareaRef.current?.setSelectionRange(
+        nextContent.length,
+        nextContent.length
+      )
     })
   }
 
@@ -128,7 +103,10 @@ const CreatePostForm = ({ onPostCreated }) => {
 
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
-      textareaRef.current?.setSelectionRange(nextCaretPosition, nextCaretPosition)
+      textareaRef.current?.setSelectionRange(
+        nextCaretPosition,
+        nextCaretPosition
+      )
       caretPositionRef.current = nextCaretPosition
     })
   }
@@ -139,7 +117,7 @@ const CreatePostForm = ({ onPostCreated }) => {
 
     const payload = {
       content,
-      ...getMentionPayload(content, selectedMentionUsers),
+      ...getMentionPayload(content),
       ...getTopicPayload(content),
     }
 
@@ -157,7 +135,6 @@ const CreatePostForm = ({ onPostCreated }) => {
       setContent("")
       setActiveToken(null)
       setIsEmojiPickerOpen(false)
-      setSelectedMentionUsers({})
       onPostCreated()
       toast.success("Posted! Your post is live.")
     } catch (err) {
@@ -174,8 +151,6 @@ const CreatePostForm = ({ onPostCreated }) => {
 
   const showTopicSuggestions =
     activeToken?.type === "topic" && topicSuggestions.length > 0
-  const showMentionSuggestions =
-    activeToken?.type === "mention" && mentionSuggestions.length > 0
 
   return (
     <Card className="mb-6">
@@ -197,9 +172,11 @@ const CreatePostForm = ({ onPostCreated }) => {
               <div className="relative">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 min-h-20 overflow-hidden whitespace-pre-wrap wrap-break-word p-2 text-base leading-normal text-foreground md:text-base"
+                  className="pointer-events-none absolute inset-0 min-h-20 overflow-hidden p-2 text-base leading-normal wrap-break-word whitespace-pre-wrap text-foreground md:text-base"
                 >
-                  <div style={{ transform: `translateY(-${overlayScrollTop}px)` }}>
+                  <div
+                    style={{ transform: `translateY(-${overlayScrollTop}px)` }}
+                  >
                     {content ? renderHighlightedContent(content) : null}
                   </div>
                 </div>
@@ -209,24 +186,30 @@ const CreatePostForm = ({ onPostCreated }) => {
                   value={content}
                   onChange={handleContentChange}
                   onClick={(event) =>
-                    updateActiveToken(content, event.currentTarget.selectionStart)
+                    updateActiveToken(
+                      content,
+                      event.currentTarget.selectionStart
+                    )
                   }
                   onKeyUp={(event) =>
-                    updateActiveToken(content, event.currentTarget.selectionStart)
+                    updateActiveToken(
+                      content,
+                      event.currentTarget.selectionStart
+                    )
                   }
                   onScroll={(event) =>
                     setOverlayScrollTop(event.currentTarget.scrollTop)
                   }
-                  className="relative z-10 min-h-20 resize-none rounded-none border-0 border-b border-gray-200 bg-transparent p-2 text-base leading-normal text-transparent caret-foreground placeholder:text-muted-foreground placeholder:opacity-100 focus-visible:border-gray-400 focus-visible:ring-0 dark:border-b dark:border-gray-700 md:text-base"
+                  className="relative z-10 min-h-20 resize-none rounded-none border-0 border-b border-gray-200 bg-transparent p-2 text-base leading-normal text-transparent caret-foreground placeholder:text-muted-foreground placeholder:opacity-100 focus-visible:border-gray-400 focus-visible:ring-0 md:text-base dark:border-b dark:border-gray-700"
                   rows={3}
                   maxLength={500}
                 />
-                <div className="absolute bottom-2 right-2 z-20 text-xs text-muted-foreground">
+                <div className="absolute right-2 bottom-2 z-20 text-xs text-muted-foreground">
                   {content.length}/500
                 </div>
               </div>
 
-              {(showTopicSuggestions || showMentionSuggestions) && (
+              {showTopicSuggestions && (
                 <div className="flex flex-wrap gap-2">
                   {showTopicSuggestions &&
                     topicSuggestions.map((topic) => (
@@ -236,29 +219,10 @@ const CreatePostForm = ({ onPostCreated }) => {
                         variant="outline"
                         size="sm"
                         onMouseDown={(event) => event.preventDefault()}
-                        onClick={() => handleSelectToken(topic)}
+                        onClick={() => handleInsertTopic(topic)}
                         className="h-7 rounded-full px-3 text-sky-600 hover:text-sky-700"
                       >
                         {topic}
-                      </Button>
-                    ))}
-                  {showMentionSuggestions &&
-                    mentionSuggestions.map((suggestedUser) => (
-                      <Button
-                        key={getUserId(suggestedUser) || suggestedUser.username}
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onMouseDown={(event) => event.preventDefault()}
-                        onClick={() =>
-                          handleSelectToken(
-                            `@${suggestedUser.username}`,
-                            suggestedUser
-                          )
-                        }
-                        className="h-7 rounded-full px-3 text-emerald-600 hover:text-emerald-700"
-                      >
-                        @{suggestedUser.username}
                       </Button>
                     ))}
                 </div>
@@ -310,8 +274,10 @@ const CreatePostForm = ({ onPostCreated }) => {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-blue-500 transition-colors"
-                    onClick={() => toast.info("Image upload will be available soon!")}
+                    className="h-8 w-8 rounded-full text-muted-foreground transition-colors hover:text-blue-500"
+                    onClick={() =>
+                      toast.info("Image upload will be available soon!")
+                    }
                   >
                     <Image className="h-4 w-4" />
                   </Button>
@@ -321,7 +287,7 @@ const CreatePostForm = ({ onPostCreated }) => {
                     size="icon"
                     aria-expanded={isEmojiPickerOpen}
                     aria-label="Open emoji picker"
-                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-blue-500 transition-colors"
+                    className="h-8 w-8 rounded-full text-muted-foreground transition-colors hover:text-blue-500"
                     onClick={() => setIsEmojiPickerOpen((open) => !open)}
                   >
                     <Smile className="h-4 w-4" />
@@ -363,7 +329,6 @@ const CreatePostForm = ({ onPostCreated }) => {
                       setContent("")
                       setActiveToken(null)
                       setIsEmojiPickerOpen(false)
-                      setSelectedMentionUsers({})
                     }}
                     className="text-muted-foreground"
                   >
@@ -373,7 +338,7 @@ const CreatePostForm = ({ onPostCreated }) => {
                   <Button
                     type="submit"
                     disabled={!content.trim() || isSubmitting}
-                    className="light:bg-black light:text-white rounded-xl px-8 font-bold dark:bg-white dark:text-black transition-all hover:scale-105"
+                    className="light:bg-black light:text-white rounded-xl px-8 font-bold transition-all hover:scale-105 dark:bg-white dark:text-black"
                   >
                     {isSubmitting ? "Posting..." : "Post"}
                   </Button>
