@@ -10,11 +10,14 @@ import {
 } from "@/components/ui/input-group"
 
 import { Separator } from "@/components/ui/separator"
+import { loginSchema } from "@/validators/authValidator"
+import { validateSchema } from "@/validators/validation"
 
 export default function LoginForm({ error, isLoading, onSubmit }) {
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [validationError, setValidationError] = useState("")
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
@@ -22,11 +25,20 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
+    const { error: schemaError, value } = validateSchema(loginSchema, {
+      email: identifier,
+      password,
+    })
+
+    if (schemaError) {
+      setValidationError(schemaError)
+      return
+    }
+
+    setValidationError("")
+
     try {
-      await onSubmit({
-        email: identifier,
-        password,
-      })
+      await onSubmit(value)
 
       setPassword("")
     } catch {
@@ -78,9 +90,9 @@ export default function LoginForm({ error, isLoading, onSubmit }) {
         </InputGroup>
       </Field>
 
-      {error ? (
+      {validationError || error ? (
         <p className="text-sm text-destructive" role="alert">
-          {error}
+          {validationError || error}
         </p>
       ) : null}
 

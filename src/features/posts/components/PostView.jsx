@@ -44,6 +44,9 @@ import {
   getUserId,
   renderInteractiveContent,
 } from "@/features/posts/utils/contentTokens"
+import { toast } from "sonner"
+import { commentSchema, replySchema } from "@/validators/commentValidator"
+import { validateSchema } from "@/validators/validation"
 
 function MentionCommentInput({
   disabled = false,
@@ -454,13 +457,22 @@ export default function PostView({ postId }) {
   ) => {
     if (!content.trim()) return
 
+    const payload = {
+      content,
+      ...getMentionPayload(content, selectedMentionUsers),
+      ...getTopicPayload(content),
+    }
+
+    const { error: schemaError } = validateSchema(commentSchema, payload)
+
+    if (schemaError) {
+      toast.error(schemaError)
+      return
+    }
+
     setIsSubmitting(true)
     try {
-      await addComment(postId, {
-        content,
-        ...getMentionPayload(content, selectedMentionUsers),
-        ...getTopicPayload(content),
-      })
+      await addComment(postId, payload)
       setNewComment("")
       setPost((p) =>
         p ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
@@ -478,14 +490,23 @@ export default function PostView({ postId }) {
     selectedMentionUsers = {}
   ) => {
     if (!content.trim()) return
+
+    const payload = {
+      parentCommentId,
+      content,
+      ...getMentionPayload(content, selectedMentionUsers),
+      ...getTopicPayload(content),
+    }
+
+    const { error: schemaError } = validateSchema(replySchema, payload)
+
+    if (schemaError) {
+      toast.error(schemaError)
+      return
+    }
     setIsSubmitting(true)
     try {
-      await addReply(postId, {
-        parentCommentId,
-        content,
-        ...getMentionPayload(content, selectedMentionUsers),
-        ...getTopicPayload(content),
-      })
+      await addReply(postId, payload)
       // Refresh comments to show the new reply
       await fetchComments(postId, true)
     } catch (err) {

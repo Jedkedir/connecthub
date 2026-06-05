@@ -27,6 +27,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/features/auth/hooks/useAuth"
 import { useProfile } from "@/features/profile/hooks/useProfile"
 import { cn } from "@/shared/utils/cn"
+import {
+  changePasswordSchema,
+  editProfileSchema,
+} from "@/validators/authValidator"
+import { validateSchema } from "@/validators/validation"
 
 // Dicebear avatar seed options
 const AVATAR_SEEDS = [
@@ -69,7 +74,7 @@ export default function EditProfile() {
   const [fullName, setFullName] = useState(user?.fullname || "")
   const [bio, setBio] = useState(user?.bio || "")
   const [selectedAvatarSeed, setSelectedAvatarSeed] = useState(
-    user?.fullname || "Alice"
+    user?.profilePic || "Alice"
   )
   const [showAvatarDialog, setShowAvatarDialog] = useState(false)
 
@@ -81,6 +86,7 @@ export default function EditProfile() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [passwordError, setPasswordError] = useState("")
+  const [profileError, setProfileError] = useState("")
 
   const avatarUrl = useMemo(
     () => generateAvatarUrl(selectedAvatarSeed),
@@ -91,7 +97,7 @@ export default function EditProfile() {
     return (
       fullName !== (user?.fullname || "") ||
       bio !== (user?.bio || "") ||
-      selectedAvatarSeed !== (user?.fullname || "Alice")
+      selectedAvatarSeed !== (user?.profilePic || "Alice")
     )
   }, [fullName, bio, selectedAvatarSeed, user])
 
@@ -105,12 +111,21 @@ export default function EditProfile() {
   const handleUpdateProfile = useCallback(async () => {
     if (!profileChanged) return
 
+    const { error: schemaError, value } = validateSchema(editProfileSchema, {
+      fullname: fullName,
+      bio,
+      profilePic: avatarUrl,
+    })
+
+    if (schemaError) {
+      setProfileError(schemaError)
+      return
+    }
+
+    setProfileError("")
+
     try {
-      const result = await updateProfile({
-        fullname: fullName,
-        bio,
-        profilePic: avatarUrl,
-      })
+      const result = await updateProfile(value)
 
       // Update auth store with new user data
       if (result?.user) {
@@ -124,20 +139,21 @@ export default function EditProfile() {
   const handleChangePassword = useCallback(async () => {
     setPasswordError("")
 
-    if (!passwordValid) {
-      setPasswordError("Password requirements not met")
-      return
-    }
+    const { error: schemaError, value } = validateSchema(changePasswordSchema, {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    })
 
-    if (newPassword === currentPassword) {
-      setPasswordError("New password must be different from current password")
+    if (schemaError) {
+      setPasswordError(schemaError)
       return
     }
 
     try {
       await changePassword({
-        currentPassword,
-        newPassword,
+        currentPassword: value.currentPassword,
+        newPassword: value.newPassword,
       })
 
       // Clear form
@@ -152,7 +168,7 @@ export default function EditProfile() {
         "Failed to change password"
       setPasswordError(message)
     }
-  }, [passwordValid, newPassword, currentPassword, changePassword])
+  }, [confirmPassword, currentPassword, newPassword, changePassword])
 
   const isLoading =
     updateProfileState.isLoading || changePasswordState.isLoading
@@ -277,6 +293,11 @@ export default function EditProfile() {
                 "Failed to update profile"}
             </div>
           )}
+          {profileError && (
+            <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+              {profileError}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -363,11 +384,6 @@ export default function EditProfile() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </InputGroup>
-                {confirmPassword && newPassword !== confirmPassword && (
-                  <p className="mt-1 text-xs text-destructive">
-                    Passwords do not match
-                  </p>
-                )}
               </Field>
 
               {passwordError && (

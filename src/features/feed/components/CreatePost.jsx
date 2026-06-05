@@ -18,6 +18,8 @@ import {
   getUserId,
   renderHighlightedContent,
 } from "@/features/posts/utils/contentTokens"
+import { createPostSchema } from "@/validators/postValidator"
+import { validateSchema } from "@/validators/validation"
 
 const EMOJI_GROUPS = [
   {
@@ -134,15 +136,23 @@ const CreatePostForm = ({ onPostCreated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!content.trim()) return
+
+    const payload = {
+      content,
+      ...getMentionPayload(content, selectedMentionUsers),
+      ...getTopicPayload(content),
+    }
+
+    const { error: schemaError } = validateSchema(createPostSchema, payload)
+
+    if (schemaError) {
+      toast.error(schemaError)
+      return
+    }
+
     setIsSubmitting(true)
     try {
-      const mentionPayload = getMentionPayload(content, selectedMentionUsers)
-
-      await createPost({
-        content,
-        ...mentionPayload,
-        ...getTopicPayload(content),
-      })
+      await createPost(payload)
 
       setContent("")
       setActiveToken(null)

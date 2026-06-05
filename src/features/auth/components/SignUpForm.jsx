@@ -9,12 +9,15 @@ import {
   InputGroupButton,
 } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
+import { signupSchema } from "@/validators/authValidator"
+import { validateSchema } from "@/validators/validation"
 
 export default function SignupForm({ error, isLoading, onSubmit }) {
   const [fullName, setFullName] = useState("")
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [validationError, setValidationError] = useState("")
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev)
@@ -22,14 +25,27 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
+    const { error: schemaError, value } = validateSchema(signupSchema, {
+      fullname: fullName,
+      email: identifier,
+      password,
+    })
+
+    if (schemaError) {
+      setValidationError(schemaError)
+      return
+    }
+
+    setValidationError("")
+
     try {
       await onSubmit({
-        fullname: fullName
-          .split(" ")
+        fullname: value.fullname
+          .split(/\s+/)
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(" "),
-        email: identifier,
-        password,
+        email: value.email,
+        password: value.password,
       })
 
       setFullName("")
@@ -101,9 +117,9 @@ export default function SignupForm({ error, isLoading, onSubmit }) {
         </InputGroup>
       </Field>
 
-      {error ? (
+      {validationError || error ? (
         <p className="text-sm text-destructive" role="alert">
-          {error}
+          {validationError || error}
         </p>
       ) : null}
 
